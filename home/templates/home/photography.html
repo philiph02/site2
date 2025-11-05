@@ -2,16 +2,60 @@
 {% load static wagtailcore_tags %}
 {% load wagtailimages_tags %}
 
-{# Dieser Block lädt das Shop-CSS in den <head> von base.html #}
+{# SCHRITT 1: CSS. Ich habe die ::after-Regeln entfernt und deine neuen .custom-play-button-Stile hinzugefügt. #}
 {% block extra_head %}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
     <link rel="stylesheet" href="{% static 'home/assets_shop/css/swiper-bundle.min.css' %}">
     <link rel="stylesheet" href="{% static 'home/assets_shop/css/style.css' %}">
     <link rel="stylesheet" href="{% static 'home/assets_shop/css/colors/color-1.css' %}">
+    
+    <style>
+        .tab-nav-container { text-align: center; margin-bottom: var(--mb-2-5); }
+        .tab-button { background-color: var(--container-color); color: var(--title-color); border: 2px solid var(--scroll-bar-color); padding: 1rem 1.75rem; border-radius: .5rem; font-weight: var(--font-medium); cursor: pointer; transition: .3s; margin: 0 .5rem; }
+        .tab-button.active { background: #575757; color: #ffffff; border-color: #575757; }
+        .tab-button:hover:not(.active) { background-color: var(--body-color); border-color: var(--title-color); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        /*
+         * ======================================
+         * NEUES VIDEO-PLAYER STYLING (BASIEREND AUF DEINEM BEISPIEL)
+         * ======================================
+        */
+        .video-player-placeholder {
+            width: 100%; max-width: 560px; height: 315px; background-color: #000;
+            border-radius: .5rem; margin: 0 auto var(--mb-1-5); position: relative;
+            background-size: cover; background-position: center; overflow: hidden;
+            cursor: pointer;
+        }
+        
+        /* Dein neuer, nicht-transparenter Button-Stil */
+        .custom-play-button {
+            width: 80px; /* 2em war zu klein, 80px ist eine gute Größe */
+            height: auto;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            transition: transform 0.2s ease;
+        }
+
+        /* Leichter Zoom-Effekt beim Hovern */
+        .video-player-placeholder:hover .custom-play-button {
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        /* Versteckt den Play-Button, wenn das Video geladen wird */
+        .video-player-placeholder.is-playing .custom-play-button {
+            display: none;
+            opacity: 0;
+        }
+    </style>
 {% endblock %}
 
 
-{# Dieser Block fügt den Shop-Inhalt in base.html ein #}
+{# SCHRITT 2: Der Hauptinhalt mit den Tabs #}
 {% block content %}
 
 <div class="login" id="login">
@@ -41,22 +85,155 @@
 
 
 <main class="main">
-+
-+
 
-    <section class="new section">
-    <h2 class="section__title">HELLO WORLD PHOTOGRAPHY.HTML</h2>
-    
+    <section class="section container">
+
+
+        <div class="tab-nav-container">
+            <button class="tab-button active" data-target="#photography-content">Photography</button>
+            <button class="tab-button" data-target="#videography-content">Videography</button>
+        </div>
+
+        <div id="photography-content" class="tab-content active">
+            <div class="new section" style="padding-top: 0;">
+                <div class="prints-swiper-wrapper" style="position: relative;">
+                    <div class="new__container container">
+                        <div class="swiper new-swiper">
+                            <div class="swiper-wrapper">
+                                <a href="{% static 'home/assets/images/gallery/fulls/01.jpg' %}" class="new__content swiper-slide" style="text-decoration: none;">
+                                    <img src="{% static 'home/assets/images/gallery/thumbs/01.jpg' %}" alt="" class="new__img" />
+                                </a>
+                                <a href="{% static 'home/assets/images/gallery/fulls/02.jpg' %}" class="new__content swiper-slide" style="text-decoration: none;">
+                                    <img src="{% static 'home/assets/images/gallery/thumbs/02.jpg' %}" alt="" class="new__img" />
+                                </a>
+                                <a href="{% static 'home/assets/images/gallery/fulls/03.jpg' %}" class="new__content swiper-slide" style="text-decoration: none;">
+                                    <img src="{% static 'home/assets/images/gallery/thumbs/03.jpg' %}" alt="" class="new__img" />
+                                </a>
+                                <a href="{% static 'home/assets/images/gallery/fulls/04.jpg' %}" class="new__content swiper-slide" style="text-decoration: none;">
+                                    <img src="{% static 'home/assets/images/gallery/thumbs/04.jpg' %}" alt="" class="new__img" />
+                                </a>
+                                <a href="{% static 'home/assets/images/gallery/fulls/05.jpg' %}" class="new__content swiper-slide" style="text-decoration: none;">
+                                    <img src="{% static 'home/assets/images/gallery/thumbs/05.jpg' %}" alt="" class="new__img" />
+                                </a>
+                                <a href="{% static 'home/assets/images/gallery/fulls/06.jpg' %}" class="new__content swiper-slide" style="text-decoration: none;">
+                                    <img src="{% static 'home/assets/images/gallery/thumbs/06.jpg' %}" alt="" class="new__img" />
+                                </a>
+                                <a href="{% static 'home/assets/images/gallery/fulls/07.jpg' %}" class="new__content swiper-slide" style="text-decoration: none;">
+                                    <img src="{% static 'home/assets/images/gallery/thumbs/07.jpg' %}" alt="" class="new__img" />
+                                </a>
+                                <a href="{% static 'home/assets/images/gallery/fulls/08.jpg' %}" class="new__content swiper-slide" style="text-decoration: none;">
+                                    <img src="{% static 'home/assets/images/gallery/thumbs/08.jpg' %}" alt="" class="new__img" />
+                                </a>
+                                <a href="{% static 'home/assets/images/gallery/fulls/09.jpg' %}" class="new__content swiper-slide" style="text-decoration: none;">
+                                    <img src="{% static 'home/assets/images/gallery/thumbs/09.jpg' %}" alt="" class="new__img" />
+                                </a>
+                            </div>
+                            <div class="swiper-pagination prints-pagination"></div>
+                        </div>
+                    </div>
+                    <div class="swiper-button-prev"></div>
+                    <div class="swiper-button-next"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="videography-content" class="tab-content">
+            <div class="steps__container grid" style="grid-template-columns: 1fr; gap: 3rem; margin-top: 2rem;">
+                
+                <article class="steps__card" style="padding: 2rem;">
+                    <h3 class="steps__card-title" style="text-align: center; font-size: var(--h3-font-size);">AKS Muthgasse</h3>
+                    
+                    <div class="video-player-placeholder" 
+                         style="background-image: url(/media/video/aks_muthgasse_qhd_thumbnail.jpg)"
+                         data-poster-src="/media/video/aks_muthgasse_qhd_thumbnail.jpg"
+                         data-video-src="/media/video/aks_muthgasse_qhd.mp4">
+                        
+                        <img class="custom-play-button" src="https://www.pngitem.com/pimgs/b/255-2554901_recording-icon-png.png" alt="Play Video">
+                    </div>
+                    <p class="steps__card-description" style="text-align: center;">Ein Video-Rundgang durch das Projekt AKS Muthgasse.</p>
+                </article>
+
+                <article class="steps__card" style="padding: 2rem;">
+                    <h3 class="steps__card-title" style="text-align: center; font-size: var(--h3-font-size);">AKS Showroom</h3>
+                    
+                    <div class="video-player-placeholder" 
+                         style="background-image: url(/media/video/aks_showroom_qhd_thumbnail.jpg)"
+                         data-poster-src="/media/video/aks_showroom_qhd_thumbnail.jpg"
+                         data-video-src="/media/video/aks_showroom_qhd.mp4">
+                        
+                        <img class="custom-play-button" src="https://www.pngitem.com/pimgs/b/255-2554901_recording-icon-png.png" alt="Play Video">
+                    </div>
+                    <p class="steps__card-description" style="text-align: center;">Ein Blick in den AKS Showroom.</p>
+                </article>
+
+            </div>
+        </div>
     </section>
-
 
 </main>
 {% endblock %}
 
 
-{# Dieser Block lädt das Shop-JavaScript am Ende von base.html #}
+{# SCHRITT 3: Das JavaScript ist dasselbe wie im vorherigen Schritt. Es funktioniert immer noch. #}
 {% block extra_js %}
-    {{ block.super }} {# Übernimmt das Script aus base.html #}
+    {{ block.super }} {# Behält die globalen Skripte aus base.html #}
+    
     <script src="{% static 'home/assets_shop/js/swiper-bundle.min.js' %}?v=1.0.9"></script>
-    <script src="{% static 'home/assets_shop/js/main.js' %}?v=1.0.9"></script>
+    <script src="{% static 'home/assets_shop/js/main.js' %}?v=1.0.9"></script> 
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // --- 1. Logik für die Tabs (Photography/Videography) ---
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    const targetContent = document.querySelector(targetId);
+
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+
+                    this.classList.add('active');
+                    if (targetContent) {
+                        targetContent.classList.add('active');
+                    }
+                });
+            });
+
+            // --- 2. Logik für "Klick-zum-Spielen" ---
+            const videoPlaceholders = document.querySelectorAll('.video-player-placeholder');
+
+            videoPlaceholders.forEach(placeholder => {
+                placeholder.addEventListener('click', function() {
+                    const videoSrc = this.getAttribute('data-video-src');
+                    const posterSrc = this.getAttribute('data-poster-src');
+
+                    if (!videoSrc) {
+                        console.error('Kein "data-video-src" Attribut auf dem Platzhalter gefunden!');
+                        return;
+                    }
+
+                    // Versteckt den .custom-play-button (durch Hinzufügen der CSS-Klasse)
+                    this.classList.add('is-playing'); 
+
+                    // Ersetzt den Inhalt (inklusive des <img>-Buttons) durch den Video-Player
+                    this.innerHTML = `
+                        <video controls autoplay poster="${posterSrc}" style="width:100%; height:100%; border-radius: .5rem; object-fit: cover;">
+                            <source src="${videoSrc}" type="video/mp4">
+                            Dein Browser unterstützt das Video-Tag nicht.
+                        </video>
+                    `;
+                    
+                    const videoElement = this.querySelector('video');
+                    if (videoElement) {
+                        videoElement.play();
+                    }
+
+                }, { once: true }); 
+            });
+        });
+    </script>
 {% endblock %}

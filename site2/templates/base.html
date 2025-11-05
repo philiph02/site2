@@ -34,22 +34,23 @@
 
         <header class="header" id="header">
             <nav class="nav container">
-                <a href="{% if about_page %}{% pageurl about_page %}{% else %}/{% endif %}" class="nav__logo" style="display: flex; align-items: center;">
+                <a href="{% if shop_page %}{% pageurl shop_page %}{% else %}/{% endif %}" class="nav__logo" style="display: flex; align-items: center;">
                     <img src="{% static 'home/assets/images/logo_cumulophib.png' %}" alt="Logo" style="height: 2.5em; vertical-align: middle; margin-right: 0.5em;">
                 </a>
         
                 <div class="nav__menu" id="nav-menu">
                     <ul class="nav__list">
                         
-                        {% if about_page %}
-                            <li class="nav__item"><a href="{% pageurl about_page %}" class="nav__link {% if page.url == about_page.url %}active-link{% endif %}">About Me</a></li>
-                        {% endif %}
                         {% if shop_page %}
                             <li class="nav__item"><a href="{% pageurl shop_page %}" class="nav__link {% if page.url == shop_page.url or page.get_parent.url == shop_page.url %}active-link{% endif %}">Shop</a></li>
                         {% endif %}
-                        
+
                         {% if photography_page %}
-                            <li class="nav__item"><a href="{% pageurl photography_page %}" class="nav__link {% if page.url == photography_page.url %}active-link{% endif %}">Photography</a></li>
+                            <li class="nav__item"><a href="{% pageurl photography_page %}" class="nav__link {% if page.url == photography_page.url %}active-link{% endif %}">Book Me</a></li>
+                        {% endif %}
+
+                        {% if about_page %}
+                            <li class="nav__item"><a href="{% pageurl about_page %}" class="nav__link {% if page.url == about_page.url %}active-link{% endif %}">About Me</a></li>
                         {% endif %}
                         
                     </ul>
@@ -74,6 +75,10 @@
                 </div>
             </nav>
         </header>
+
+
+
+
         <div class="cart" id="cart">
             <i class="bx bx-x cart__close" id="cart-close"></i>
             <h2 class="cart__title-center">My Cart</h2>
