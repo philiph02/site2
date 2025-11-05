@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+{% load static wagtailcore_tags %}
+{% load wagtailimages_tags %}
+
+{# Dieser Block lädt das Shop-CSS in den <head> von base.html #}
+{% block extra_head %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+    <link rel="stylesheet" href="{% static 'home/assets_shop/css/swiper-bundle.min.css' %}">
+    <link rel="stylesheet" href="{% static 'home/assets_shop/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'home/assets_shop/css/colors/color-1.css' %}">
+{% endblock %}
+
+
+{# Dieser Block fügt den Shop-Inhalt in base.html ein #}
+{% block content %}
+
+<div class="login" id="login">
+    <i class="bx bx-x login__close" id="login-close"></i>
+    <h2 class="login__title-center">Login</h2>
+    <form action="" class="login__form grid">
+        <div class="login__content">
+            <label for="" class="login__label">Email</label>
+            <input type="email" class="login__input">
+        </div>
+        <div class="login__content">
+            <label for="" class="login__label">Password</label>
+            <input type="password" class="login__input">
+        </div>
+        <div>
+            <a href="#" class="button">Sign in</a>
+        </div>
+        <div>
+        {% if registration_page %}
+            <p class="signup">Not a member? <a href="{% pageurl registration_page %}">Sign up now</a></p>
+        {% else %}
+            <p class="signup"><span>Sign up now</span></p>
+        {% endif %}
+        </div>
+    </form>
+</div>
+
+
+<main class="main">
+    <section class="home container">
+        <div class="swiper home-swiper">
+            <div class="swiper-wrapper">
+                <section class="swiper-slide">
+                    <div class="home__content grid">
+                        <div class="home__group">
+                            <img src="{% static 'home/assets_shop/img/pics_jpg/web-7329.jpg' %}" alt="" class="home__img">
+                            <div class="home__indicator"></div>
+                            <div class="home__details-img">
+                                <h4 class="home__details-title">25" exposure</h4>
+                                <span class="home__details-subtitle">Namibia</span>
+                            </div>
+                        </div>
+                        <div class="home__data">
+                            <h3 class="home__subtitle">#1 TRENDING ITEM</h3>
+                            <h1 class="home__title">CELESTIAL  <br> RUNWAY <br> </h1>
+                            <p class="home__description">Beneath the Milky Way’s arc, a glider awaits its journey—where sand, sky, and starlight blur the edge of possibility.</p>
+                            <div class="home__buttons">
+                                <a href="#" class="button">Buy Now</a>
+                                <a href="#" class="button--link button--flex">View Details <i class="bx bx-right-arrow-alt button__icon"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section class="swiper-slide">
+                    <div class="home__content grid">
+                        <div class="home__group">
+                            <img src="{% static 'home/assets_shop/img/pics_jpg/web-5214.jpg' %}" alt="" class="home__img">
+                            <div class="home__indicator"></div>
+
+                            <div class="home__details-img">
+                                <h4 class="home__details-title">Rolls-Royce RB211</h4>
+                                <span class="home__details-subtitle">Frankfurt</span>
+                            </div>
+                        </div>
+
+                        <div class="home__data">
+                            <h3 class="home__subtitle">#2 ROAR</h3>
+                            <h1 class="home__title">ROLLS <br> ROYCE <br> </h1>
+                            <p class="home__description">Meet the iconic Rolls-Royce RB211 engine beneath the wing of a Boeing 757 at Frankfurt Airport. Precision engineering meets the poetry of flight, where every turbine blade tells a story of power, progress, and wanderlust.</p>
+
+                            <div class="home__buttons">
+                                <a href="#" class="button">Buy Now</a>
+                                <a href="#" class="button--link button--flex">View Details <i class="bx bx-right-arrow-alt button__icon"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="swiper-slide">
+                    <div class="home__content grid">
+                        <div class="home__group">
+                            <img src="{% static 'home/assets_shop/img/pics_jpg/web-10.jpg' %}" alt="" class="home__img">
+                            <div class="home__indicator"></div>
+
+                            <div class="home__details-img">
+                                <h4 class="home__details-title">Wrong direction?</h4>
+                                <span class="home__details-subtitle">Meduno</span>
+                            </div>
+                        </div>
+
+                        <div class="home__data">
+                            <h3 class="home__subtitle">#3 Chasing the wind</h3>
+                            <h1 class="home__title">WRONG  <br> DIRECTION  <br> </h1>
+                            <p class="home__description">Evening in Meduno. With just 1.5 kg of fabric and lines, a paraglider climbs the ridge—steps lit by dusk, the journey shaped by a steady northern breeze. Upwards, toward the last light.
+But why is he running in the wrong direction?</p>
+
+                            <div class="home__buttons">
+                                <a href="#" class="button">Buy Now</a>
+                                <a href="#" class="button--link button--flex">View Details <i class="bx bx-right-arrow-alt button__icon"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+        <div class="swiper-pagination home-pagination"></div>
+    </div>
+    </section>
+
+    <section class="new section">
+    <h2 class="section__title">Prints</h2>
+    <div class="prints-swiper-wrapper" style="position: relative;">
+        <div class="new__container container">
+            <div class="swiper new-swiper">
+                <div class="swiper-wrapper">
+                {% for product in grid_products %}
+                    {% if product %}
+                        <div class="new__content swiper-slide" style="position: relative; display: flex; flex-direction: column; align-items: center;">
+                            <div class="card-main-content" style="width: 100%; position: relative;">
+                                {% if product.product_image %}
+                                    {% image product.product_image max-594x420 class="new__img" %}
+                                {% endif %}
+                                <h3 class="new__title">{{ product.title }}</h3>
+                                <span class="new__subtitle">{{ product.orientation|title }}</span>
+                                <div class="new__prices">
+                                    <span class="new__price">{{ product.price }} €</span>
+                                </div>
+                                <a href="{% pageurl product %}" class="card-link-overlay" style="position: absolute; inset: 0; z-index: 2; display: block;"></a>
+                            </div>
+
+                            <a href="{% url 'add_to_cart' product_id=product.id %}" class="button new__button add-to-cart-btn" style="z-index:3; margin-top: 12px;">
+                                <i class="bx bx-cart-alt new__icon"></i>
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="new__content swiper-slide"></div>
+                    {% endif %}
+                {% endfor %}
+
+                </div>
+                <div class="swiper-pagination prints-pagination"></div>
+            </div>
+        </div>
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
+    </div>
+</section>
+
+
+    <section class="steps section container">
+        <div class="steps__bg">
+            <h2 class="section__title">How to order products </h2>
+
+            <div class="steps__container grid">
+                <div class="steps__card">
+                    <div class="steps__card-number">01</div>
+                    <h3 class="steps__card-title">Choose Products</h3>
+                    <p class="steps__card-description">
+                        We have several varieties products you can choose from.
+                    </p>
+                </div>
+                <div class="steps__card">
+                    <div class="steps__card-number">02</div>
+                    <h3 class="steps__card-title">Place an order</h3>
+                    <p class="steps__card-description">
+                        Once your order is set, we move to the next step which is the shipping.
+                    </p>
+                </div>
+                <div class="steps__card">
+                    <div class="steps__card-number">03</div>
+                    <h3 class="steps__card-title">Get order delivered</h3>
+                    <p class="steps__card-description">
+                        Our delivery process is easy, you receive the order direct to your home.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="newsletter section">
+        <div class="newsletter__container container">
+            <h2 class="section__title">Our Newsletter</h2>
+            <p class="newsletter__description">
+                Promotion new products and sales. Directly to your inbox
+            </p>
+
+            <form action="" class="newsletter__form">
+                <input type="text" placeholder="Enter your email" class="newsletter__input">
+                <button class="button">Subscribe</button>
+            </form>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
+
+{# Dieser Block lädt das Shop-JavaScript am Ende von base.html #}
+{% block extra_js %}
+    {{ block.super }} {# Übernimmt das Script aus base.html #}
+    <script src="{% static 'home/assets_shop/js/swiper-bundle.min.js' %}?v=1.0.9"></script>
+    <script src="{% static 'home/assets_shop/js/main.js' %}?v=1.0.9"></script>
+{% endblock %}

@@ -1,0 +1,33 @@
+# Python & Django Cache
+*.log
+*.pot
+*.pyc
+__pycache__/
+local_settings.py
+
+# Datenbank (NIEMALS die DB in Git einchecken!)
+db.sqlite3
+db.sqlite3-journal
+
+# Wagtail/Django Medien-Uploads
+# (Hier landen alle Bilder, die du im Admin hochlädst)
+media/
+
+# Deine neuen Ordner-Wünsche
+# (Falls du Bilder in Ordnern namens 'img' oder 'images' ablegst,
+# die NICHT zu deinem Quellcode gehören)
+img/
+image/
+images/
+
+# Statische Dateien (von 'collectstatic')
+# Dieser Ordner wird in der Produktion erstellt und sollte nicht in Git sein.
+# Deine Quell-Bilder (wie in /home/static/home/assets_shop/img/) sind davon NICHT betroffen!
+static/ 
+
+# VS Code
+.vscode/
+
+# Betriebssystem
+.DS_Store
+Thumbs.db

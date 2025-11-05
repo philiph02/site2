@@ -1,0 +1,156 @@
+{% load static wagtailcore_tags wagtailuserbar wagtailimages_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>
+            {% block title %}
+            {% if page.seo_title %}{{ page.seo_title }}{% else %}{{ page.title }}{% endif %}
+            {% endblock %}
+            {% block title_suffix %}
+            {% wagtail_site as current_site %}
+            {% if current_site and current_site.site_name %}- {{ current_site.site_name }}{% endif %}
+            {% endblock %}
+        </title>
+        {% if page.search_description %}
+        <meta name="description" content="{{ page.search_description }}" />
+        {% endif %}
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        {% if request.in_preview_panel %}
+        <base target="_blank">
+        {% endif %}
+
+        <link rel="stylesheet" type="text/css" href="{% static 'css/site2.css' %}">
+        
+        {# Dieser Block lädt Shop-CSS ODER Photography-CSS #}
+        {% block extra_head %}
+        {% endblock %}
+    </head>
+
+    <body class="{% block body_class %}{% endblock %}">
+        {% wagtailuserbar %}
+
+        <header class="header" id="header">
+            <nav class="nav container">
+                <a href="{% if about_page %}{% pageurl about_page %}{% else %}/{% endif %}" class="nav__logo" style="display: flex; align-items: center;">
+                    <img src="{% static 'home/assets/images/logo_cumulophib.png' %}" alt="Logo" style="height: 2.5em; vertical-align: middle; margin-right: 0.5em;">
+                </a>
+        
+                <div class="nav__menu" id="nav-menu">
+                    <ul class="nav__list">
+                        
+                        {% if about_page %}
+                            <li class="nav__item"><a href="{% pageurl about_page %}" class="nav__link {% if page.url == about_page.url %}active-link{% endif %}">About Me</a></li>
+                        {% endif %}
+                        {% if shop_page %}
+                            <li class="nav__item"><a href="{% pageurl shop_page %}" class="nav__link {% if page.url == shop_page.url or page.get_parent.url == shop_page.url %}active-link{% endif %}">Shop</a></li>
+                        {% endif %}
+                        
+                        {% if photography_page %}
+                            <li class="nav__item"><a href="{% pageurl photography_page %}" class="nav__link {% if page.url == photography_page.url %}active-link{% endif %}">Photography</a></li>
+                        {% endif %}
+                        
+                    </ul>
+                    <div class="nav__close" id="nav-close">
+                        <i class="bx bx-x"></i>
+                    </div>
+                </div>
+        
+                <div class="nav__btns">
+                    <div class="login__toggle" id="login-button">
+                        <i class="bx bx-user"></i>
+                    </div>
+                    <div class="nav__shop" id="cart-shop">
+                        <i class="bx bx-shopping-bag"></i>
+                        {% if cart_total_count > 0 %}
+                            <span class="cart-count">{{ cart_total_count }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="nav__toggle" id="nav-toggle">
+                        <i class="bx bx-grid-alt"></i>
+                    </div>
+                </div>
+            </nav>
+        </header>
+        <div class="cart" id="cart">
+            <i class="bx bx-x cart__close" id="cart-close"></i>
+            <h2 class="cart__title-center">My Cart</h2>
+            <div class="cart__container">
+                {% for item in cart_items %}
+                    <article class="cart__card">
+                        <div class="cart__box">
+                            {% if item.product.product_image %}
+                                {% image item.product.product_image fill-100x100 class="cart__img" alt=item.product.title %}
+                            {% endif %}
+                        </div>
+                        <div class="cart__details">
+                            <h3 class="cart__title">{{ item.product.title }}</h3>
+                            <span class="cart__price">{{ item.item_total }} €</span>
+                            <span class="cart__quantity">Menge: {{ item.quantity }}</span>
+                            <a href="{% url 'remove_one_from_cart' product_id=item.product.id %}" class="cart__amount-trash-link" title="Remove one">
+                                <i class="bx bx-trash-alt cart__amount-trash"></i>
+                            </a>
+                        </div>
+                    </article>
+                {% empty %}
+                    <p style="padding: 20px; text-align: center;">Dein Warenkorb ist leer.</p>
+                {% endfor %}
+            </div>
+            <div class="cart__prices">
+                <span class="cart__prices-item">{{ cart_total_count }} item(s)</span>
+                <span class="cart__prices-total">{{ cart_total_price }} €</span>
+            </div>
+        </div>
+        {% block content %}{% endblock %}
+
+        
+        <footer class="footer section">
+            <div class="footer__container container grid">
+                <div class="footer__content">
+                    <a href="#" class="footer__logo">
+                         <img src="{% static 'home/assets/images/logo_cumulophib.png' %}" alt="Logo" style="height: 2.5em; vertical-align: middle; margin-right: 0.5em;">
+                    </a>
+                    <p class="footer__description"> Danke! </p>
+                    <div class="footer__social">
+           
+                        <a href="https://www.instagram.com/cumulophib/" class="footer__social-link"><i class="bx bxl-instagram-alt"></i></a>
+                    </div>
+                </div>
+            </div>
+            <span class="footer__copy">&#169; Crypticalcoder. All rights reserved</span>
+        </footer>
+
+        <a href="#" class="scrollup" id="scroll-up">
+            <i class="bx bx-up-arrow-alt scrollup__icon"></i>
+        </a>
+
+
+        {# Global javascript #}
+        <script type="text/javascript" src="{% static 'js/site2.js' %}"></script>
+
+        {% block extra_js %}
+            <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const cart = document.getElementById('cart');
+                const deleteButtons = document.querySelectorAll('.cart__amount-trash-link');
+
+                if (cart && sessionStorage.getItem('keepCartOpen') === 'true') {
+                    sessionStorage.removeItem('keepCartOpen'); 
+                    const totalCount = {{ cart_total_count|default:0 }}; 
+                    if (totalCount > 0) {
+                        cart.classList.add('show-cart'); 
+                    }
+                }
+
+                deleteButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        sessionStorage.setItem('keepCartOpen', 'true');
+                    });
+                });
+            });
+            </script>
+        {% endblock %}
+    </body>
+</html>

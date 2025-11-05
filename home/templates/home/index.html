@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load static wagtailcore_tags %}
+{% load wagtailimages_tags %}
+
+{# Dieser Block lädt das Shop-CSS in den <head> von base.html #}
+{% block extra_head %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+    <link rel="stylesheet" href="{% static 'home/assets_shop/css/swiper-bundle.min.css' %}">
+    <link rel="stylesheet" href="{% static 'home/assets_shop/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'home/assets_shop/css/colors/color-1.css' %}">
+{% endblock %}
+
+
+{# Dieser Block fügt den Shop-Inhalt in base.html ein #}
+{% block content %}
+
+<div class="login" id="login">
+    <i class="bx bx-x login__close" id="login-close"></i>
+    <h2 class="login__title-center">Login</h2>
+    <form action="" class="login__form grid">
+        <div class="login__content">
+            <label for="" class="login__label">Email</label>
+            <input type="email" class="login__input">
+        </div>
+        <div class="login__content">
+            <label for="" class="login__label">Password</label>
+            <input type="password" class="login__input">
+        </div>
+        <div>
+            <a href="#" class="button">Sign in</a>
+        </div>
+        <div>
+        {% if registration_page %}
+            <p class="signup">Not a member? <a href="{% pageurl registration_page %}">Sign up now</a></p>
+        {% else %}
+            <p class="signup"><span>Sign up now</span></p>
+        {% endif %}
+        </div>
+    </form>
+</div>
+
+
+<main class="main">
++
++
+
+    <section class="new section">
+    <h2 class="section__title">HELLO WORLD INDEX.HTML</h2>
+    
+    </section>
+
+
+</main>
+{% endblock %}
+
+
+{# Dieser Block lädt das Shop-JavaScript am Ende von base.html #}
+{% block extra_js %}
+    {{ block.super }} {# Übernimmt das Script aus base.html #}
+    <script src="{% static 'home/assets_shop/js/swiper-bundle.min.js' %}?v=1.0.9"></script>
+    <script src="{% static 'home/assets_shop/js/main.js' %}?v=1.0.9"></script>
+{% endblock %}
