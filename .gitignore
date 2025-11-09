@@ -32,6 +32,5 @@ static/
 .DS_Store
 Thumbs.db
 
-dev.py
 
-security/
+.env
