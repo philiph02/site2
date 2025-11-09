@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load static wagtailcore_tags %} {# wagtailcore_tags hinzugefügt für pageurl #}
+
+{# =================================================== #}
+{# 1. HINZUGEFÜGT: Der CSS-Block von deinen anderen Seiten #}
+{# =================================================== #}
+{% block extra_head %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+    <link rel="stylesheet" href="{% static 'home/assets_shop/css/swiper-bundle.min.css' %}">
+    <link rel="stylesheet" href="{% static 'home/assets_shop/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'home/assets_shop/css/colors/color-1.css' %}">
+{% endblock %}
+
+
+{# =================================================== #}
+{# 2. AKTUALISIERT: Der Inhalt (jetzt mit Styling)     #}
+{# =================================================== #}
+{% block content %}
+<main class="main">
+    <section class="section container" style="text-align: center; min-height: 50vh; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+        <h2 class="section__title">Vielen Dank!</h2>
+        <p style="font-size: var(--h3-font-size);">Deine Bestellung <span style="font-weight: var(--font-semi-bold);">#{{ order.id }}</span> wurde erfolgreich aufgenommen.</p>
+        <p style="margin-top: 1rem;">Wir haben eine Bestätigung an <strong>{{ order.email }}</strong> gesendet.</p>
+        
+        {# Verwendet shop_page Variable aus deinem context_processor #}
+        {% if shop_page %}
+            <a href="{% pageurl shop_page %}" class="button" style="margin-top: 2rem;">Weiter einkaufen</a>
+        {% else %}
+             <a href="/" class="button" style="margin-top: 2rem;">Zur Startseite</a>
+        {% endif %}
+    </section>
+</main>
+{% endblock %}

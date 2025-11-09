@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+    <link rel="stylesheet" href="{% static 'home/assets_shop/css/swiper-bundle.min.css' %}">
+    <link rel="stylesheet" href="{% static 'home/assets_shop/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'home/assets_shop/css/colors/color-1.css' %}">
+    
+    <style>
+        /* Styling für das Stripe-Formular */
+        #payment-form {
+            width: 100%;
+            max-width: 500px; /* Begrenzt die Breite der Bezahlmaske */
+            margin: 0 auto; /* Zentriert die Maske */
+        }
+        #payment-element {
+            margin-bottom: var(--mb-2);
+        }
+        #payment-message {
+            color: var(--title-color);
+            font-weight: var(--font-medium);
+            text-align: center;
+            margin-top: var(--mb-1);
+        }
+        /* Styling für den Lade-Spinner */
+        .spinner {
+            display: none; /* Standardmäßig versteckt */
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+{% endblock %}
+
+
+{% block content %}
+<main class="main">
+    <section class="section container">
+        <h2 class="section__title" style="margin-bottom: 2rem;">Kasse (Schritt 2/2: Bezahlung)</h2>
+
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <p>Du bezahlst für Bestellung #{{ order.id }}</p>
+            <h3 style="font-size: var(--h2-font-size); color: var(--title-color);">Gesamt: {{ order.get_total_cost }} €</h3>
+        </div>
+
+        <!-- Das ist das Stripe-Formular -->
+        <!-- Es MUSS die action 'checkout_success' haben (die Stripe aber überschreibt) -->
+        <form id="payment-form" action="{% url 'checkout_success' %}" method="get">
+            <!-- Hier rendert Stripe.js das Bezahlfeld -->
+            <div id="payment-element"></div>
+            
+            <!-- Der Bezahl-Button -->
+            <button id="submit-button" class="button" style="width: 100%; display: flex; justify-content: center; align-items: center;">
+                <span id="button-text">Jetzt sicher bezahlen</span>
+                <div class="spinner" id="spinner"></div>
+            </button>
+            
+            <!-- Zeigt Fehlermeldungen von Stripe an -->
+            <div id="payment-message" role="alert"></div>
+        </form>
+
+    </section>
+</main>
+{% endblock %}
+
+
+{% block extra_js %}
+    {{ block.super }} {# Lädt die globalen Skripte #}
+    
+    <!-- 1. Stripe.js laden -->
+    <script src="https://js.stripe.com/v3/"></script>
+
+    <!-- 2. Stripe initialisieren -->
+    <script>
+        // Deine Keys und Secrets aus der View
+        const stripePublicKey = "{{ STRIPE_PUBLISHABLE_KEY }}";
+        const clientSecret = "{{ client_secret }}";
+        
+        // Stripe mit deinem Public Key initialisieren
+        const stripe = Stripe(stripePublicKey, {
+            locale: 'de' // Optional: Stellt die Maske auf Deutsch ein
+        });
+
+        // Das "Payment Element" initialisieren
+        const options = {
+            clientSecret: clientSecret,
+            appearance: {
+                theme: 'night', // Passt zum Dark-Mode deines Shops
+                labels: 'floating',
+                variables: {
+                    colorPrimary: '#0a84ff', // (oder deine Theme-Farbe)
+                    colorBackground: 'var(--container-color)',
+                    colorText: 'var(--text-color)',
+                    colorDanger: '#df1b41',
+                    fontFamily: 'Inter, sans-serif',
+                    borderRadius: '0.5rem',
+                }
+            }
+        };
+        const elements = stripe.elements(options);
+        const paymentElement = elements.create('payment');
+        
+        // Das Bezahlfeld in das <div> #payment-element einfügen
+        paymentElement.mount('#payment-element');
+
+        // 3. Formular-Submit abfangen
+        const form = document.getElementById('payment-form');
+        const submitButton = document.getElementById('submit-button');
+        const spinner = document.getElementById('spinner');
+        const buttonText = document.getElementById('button-text');
+        const messageContainer = document.getElementById('payment-message');
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Verhindert das normale Absenden
+
+            // Lade-Animation starten
+            submitButton.disabled = true;
+            spinner.style.display = 'block';
+            buttonText.style.display = 'none';
+            messageContainer.textContent = "";
+
+            // Stripe-Zahlung bestätigen
+            const { error } = await stripe.confirmPayment({
+                elements,
+                confirmParams: {
+                    // Die URL, zu der Stripe NACH der Zahlung weiterleitet
+                    return_url: `${window.location.origin}{% url 'checkout_success' %}`,
+                },
+            });
+
+            if (error) {
+                // Fehler ist aufgetreten (z.B. Karte abgelehnt)
+                messageContainer.textContent = error.message;
+                
+                // Lade-Animation stoppen
+                submitButton.disabled = false;
+                spinner.style.display = 'none';
+                buttonText.style.display = 'block';
+            } else {
+                // Der Benutzer wird zu Stripe weitergeleitet und dann zur return_url
+                messageContainer.textContent = "Leite zur Bezahlung weiter...";
+            }
+        });
+    </script>
+{% endblock %}

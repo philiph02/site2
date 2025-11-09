@@ -1,87 +1,114 @@
 {% extends "base.html" %}
 {% load static %}
 
+{# 1. Load all the CSS your shop pages use #}
 {% block extra_head %}
-    <!--=============== BOXICONS ===============-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
-
-    <!--=============== SWIPER CSS ===============-->
     <link rel="stylesheet" href="{% static 'home/assets_shop/css/swiper-bundle.min.css' %}">
-
-    <!--=============== CSS ===============-->
     <link rel="stylesheet" href="{% static 'home/assets_shop/css/style.css' %}">
     <link rel="stylesheet" href="{% static 'home/assets_shop/css/colors/color-1.css' %}">
+    
+    <style>
+        .registration-form p {
+            margin-bottom: var(--mb-1-5);
+        }
+        .registration-form label {
+            display: block;
+            font-size: var(--small-font-size);
+            color: var(--title-color);
+            font-weight: var(--font-medium);
+            margin-bottom: var(--mb-0-5);
+        }
+        .registration-form input[type="text"],
+        .registration-form input[type="email"],
+        .registration-form input[type="password"] {
+            width: 100%;
+            padding: 1.25rem 1.5rem;
+            border: 2px solid var(--scroll-bar-color);
+            border-radius: .5rem;
+            background-color: var(--container-color);
+            color: var(--text-color);
+            outline: none;
+            transition: border-color .3s;
+        }
+        .registration-form input[type="text"]:focus,
+        .registration-form input[type="email"]:focus,
+        .registration-form input[type="password"]:focus {
+            border-color: var(--title-color);
+        }
+        .registration-form .helptext {
+            font-size: var(--small-font-size);
+            color: var(--text-color-light);
+            margin-top: var(--mb-0-25);
+            margin-left: 0.5rem;
+            display: block; /* Make help text display correctly */
+        }
+        /* Hide default Django help text for password */
+        .registration-form #id_password2 + .helptext {
+            display: none;
+        }
+        .registration-form ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .registration-form .errorlist {
+            color: hsl(0, 80%, 60%); /* Red */
+            font-weight: var(--font-medium);
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
-
-<!--=============== HEADER ===============-->
-<header class="header" id="header">
-    <!-- Dein Header-Inhalt hier -->
-</header>
-
-<!--=============== CART ===============-->
-<div class="cart" id="cart">
-    <!-- Dein Warenkorb-Inhalt hier -->
-</div>
-
-<!--=============== LOGIN ===============-->
-<div class="login" id="login">
-    <!-- Dein Login-Formular hier -->
-</div>
-
-<!--=============== MAIN ===============-->
 <main class="main">
-    <!--=============== REGISTRATION ===============-->
-    <section class="registration section container">
-        <!-- Hier kommt dein Registrierungsformular oder -inhalt rein -->
-        <h2>Register</h2>
-        <form>
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input id="email" name="email" type="email" class="login__input" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input id="password" name="password" type="password" class="login__input" required>
-            </div>
-            <div>
-                <button type="submit" class="button">Register</button>
-            </div>
-        </form>
+    <section class="section container">
+        <h2 class="section__title" style="margin-bottom: 2rem;">Create an Account</h2>
+
+        <div style="max-width: 600px; margin: 0 auto; background: var(--container-color); padding: 2rem; border-radius: .5rem;">
+            
+            <form action="." method="post" class="registration-form">
+                {% csrf_token %}
+                
+                {{ form.as_p }}
+                
+                <p style="margin-top: 2rem;">
+                    <button type="submit" class="button">Register</button>
+                </p>
+            </form>
+
+{% comment %}
+            <p style="margin-top: 2rem; text-align: center;">
+                Already have an account? 
+                <a href="#" id="go-to-login" style="color: var(--title-color); font-weight: var(--font-medium);">Log in here</a>
+            </p>
+            {% endcomment %}
+        </div>
+        
     </section>
 </main>
+{% endblock %}
 
-<!--=============== FOOTER ===============-->
-<footer class="footer section">
-    <!-- Dein Footer-Inhalt hier -->
-</footer>
+{% block extra_js %}
+    {{ block.super }} {# Inherits scripts from base.html #}
+    
+    <script src="{% static 'home/assets_shop/js/main.js' %}?v=1.0.9"></script>
 
-<!--=============== SCROLL UP ===============-->
-<!-- z. B. -->
-<a href="#" class="scrollup" id="scroll-up">
-    <i class="bx bx-up-arrow-alt scrollup__icon"></i>
-</a>
-
-<!--=============== STYLE SWITCHER ===============-->
-<div class="style__switcher">
-    <div class="style__switcher-toggler s__icon">
-        <i class="bx bxs-cog bx-spin"></i>
-    </div>
-    <h4>Theme Colors</h4>
-    <div class="theme__colors js-theme-colors">
-        <button type="button" data-js-theme-color="color-1" class="js-theme-color-item theme__button color-1"><i class="bx bx-check"></i></button>
-        <button type="button" data-js-theme-color="color-2" class="js-theme-color-item theme__button color-2"><i class="bx bx-check"></i></button>
-        <button type="button" data-js-theme-color="color-3" class="js-theme-color-item theme__button color-3"><i class="bx bx-check"></i></button>
-        <button type="button" data-js-theme-color="color-4" class="js-theme-color-item theme__button color-4"><i class="bx bx-check"></i></button>
-        <button type="button" data-js-theme-color="color-5" class="js-theme-color-item theme__button color-5"><i class="bx bx-check"></i></button>
-    </div>
-</div>
-
-<!--=============== SWIPER JS ===============-->
-<script src="{% static 'home/assets_shop/js/swiper-bundle.min.js' %}"></script>
-
-<!--=============== JS ===============-->
-<script src="{% static 'home/assets_shop/js/main.js' %}"></script>
-
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Find the "Log in here" link
+            const loginLink = document.getElementById('go-to-login');
+            
+            // Find the login popup and the login button from main.js
+            const loginPopup = document.getElementById('login');
+            
+            if (loginLink && loginPopup) {
+                loginLink.addEventListener('click', function(e) {
+                    e.preventDefault(); // Stop the link from jumping
+                    
+                    // Manually trigger the login popup
+                    // This re-uses the logic already in your main.js
+                    loginPopup.classList.add('show-login');
+                });
+            }
+        });
+    </script>
 {% endblock %}

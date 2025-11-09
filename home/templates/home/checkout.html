@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load static %}
+
+{# =================================================== #}
+{# 1. ADDED: The CSS block from your other pages #}
+{# =================================================== #}
+{% block extra_head %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+    <link rel="stylesheet" href="{% static 'home/assets_shop/css/swiper-bundle.min.css' %}">
+    <link rel="stylesheet" href="{% static 'home/assets_shop/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'home/assets_shop/css/colors/color-1.css' %}">
+    
+    <style>
+        /* Applies your shop styling to the form fields */
+        .checkout-form p {
+            margin-bottom: var(--mb-1-5);
+        }
+        .checkout-form label {
+            display: block;
+            font-size: var(--small-font-size);
+            color: var(--title-color);
+            font-weight: var(--font-medium);
+            margin-bottom: var(--mb-0-5);
+        }
+        /* Styling for the input fields (like your login popup) */
+        .checkout-form input[type="text"],
+        .checkout-form input[type="email"] {
+            width: 100%;
+            padding: 1.25rem 1.5rem;
+            border: 2px solid var(--scroll-bar-color);
+            border-radius: .5rem;
+            background-color: var(--container-color);
+            color: var(--text-color);
+            outline: none;
+            transition: border-color .3s;
+        }
+        .checkout-form input[type="text"]:focus,
+        .checkout-form input[type="email"]:focus {
+            border-color: var(--title-color);
+        }
+    </style>
+{% endblock %}
+
+
+{# =================================================== #}
+{# 2. UPDATED: The content (now fully translated)     #}
+{# =================================================== #}
+{% block content %}
+<main class="main">
+    <section class="section container">
+        <h2 class="section__title" style="margin-bottom: 2rem;">Checkout (Step 1/2: Address)</h2>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 2.5rem;">
+        
+            <div style="flex: 1; min-width: 300px; background: var(--container-color); padding: 1.5rem; border-radius: .5rem; height: fit-content;">
+                <h3 style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--scroll-bar-color); padding-bottom: 1rem;">Order Summary</h3>
+                
+                {% if cart_items %}
+                <ul style="list-style: none; padding: 0;">
+                    {% for item in cart_items %}
+                    <li style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <span style="font-weight: var(--font-medium);">
+                            {{ item.quantity }}x {{ item.product.title }} 
+                        </span>
+                        <span style="font-weight: var(--font-semi-bold);">{{ item.item_total }} €</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <h4 style="display: flex; justify-content: space-between; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--scroll-bar-color);">
+                    <span>Total:</span>
+                    <span style="font-size: var(--h3-font-size); color: var(--title-color);">{{ cart_total_price }} €</span>
+                </h4>
+                {% else %}
+                    <p>Your cart is empty.</p>
+                {% endif %}
+            </div>
+
+            <div style="flex: 2; min-width: 300px;">
+                <h3 style="margin-bottom: 1.5rem;">Your Address</h3>
+                
+                <form action="{% url 'checkout' %}" method="post" class="checkout-form">
+                    {% csrf_token %}
+                    
+                    {{ form.as_p }}
+                    
+                    <p style="margin-top: 2rem;">
+                        <button type="submit" class="button">Proceed to Payment</button>
+                    </p>
+                </form>
+            </div>
+            
+        </div>
+    </section>
+</main>
+{% endblock %}

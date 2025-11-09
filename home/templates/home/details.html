@@ -261,34 +261,30 @@
 
                     {# --- DYNAMISCH: Beschreibung --- #}
                     <div class="details__description">
-                        <!-- <h3 class="description__title">Product Details</h3> -->
+                        <!-- 1. Your new A2 size description -->
+                        <p style="margin-bottom: var(--mb-0-75);">All prints come in A2 format (42.0 x 59.4 cm).</p>
 
+                        <!-- 2. Your original description text -->
                         <div class="simple-description">
                             {{ page.description_text | linebreaks }}
                         </div>
                     </div>
 
-                    <!-- {# Warenkorb-Buttons (bleiben statisch/JS-gesteuert) #}
-                    <div class="cart__amount">
-                        <div class="cart__amount-content">
-                            <span class="cart__amount-box">
-                                <i class="bx bx-minus"></i>
-                            </span>
-
-                            <span class="cart__amount-number">1</span>
-
-                            <span class="cart__amount-box">
-                                <i class="bx bx-plus"></i>
-                            </span>
-                        </div>
-
-                        <i class="bx bx-heart cart__amount-heart"></i>
-                    </div> -->
-
-                    <form action="{% url 'add_to_cart' product_id=page.id %}" method="POST">
+                    <form action="{% url 'add_to_cart' product_id=page.id %}" method="POST" id="add-to-cart-form">
                         {% csrf_token %}
 
-                        <button type="submit" class="button" id="add-to-cart-btn">Add To Cart</button>
+                        <!-- 3. NEW: Add-on Checkbox (only shows if price is set) -->
+                        {% if page.frame_addon_price %}
+                        <label for="add_frame_checkbox" class="product-addon-option">
+                            <input type="checkbox" name="add_frame" id="add_frame_checkbox" value="{{ page.frame_addon_price }}">
+                            <!-- This label is now connected to the input -->
+                            + With high-quality A2 Frame
+                            <span>+ {{ page.frame_addon_price }} €</span>
+                        </label>
+                        {% endif %}
+
+                        <!-- 4. Original Add to Cart Button -->
+                        <button type="submit" class="button" id="add-to-cart-btn" style="width: 100%;">Add To Cart</button>
                     </form>
 
                 </div>
@@ -512,6 +508,33 @@
     <script src="{% static 'home/assets_shop/js/main.js' %}?v=1.0.9"></script>
     <link rel="stylesheet" href="{% static 'home/assets_shop/css/style.css' %}?v=1.0.9">
 
+    {{ block.super }}
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const priceDisplay = document.getElementById('product-price');
+        const frameCheckbox = document.getElementById('add_frame_checkbox');
+        
+        // Get base price from the page text
+        const basePrice = parseFloat("{{ page.price }}");
+
+        if (priceDisplay && frameCheckbox) {
+            // Get the add-on price from the checkbox value
+            const frameAddonPrice = parseFloat(frameCheckbox.value);
+
+            frameCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    // Add addon price to base price
+                    const newTotal = basePrice + frameAddonPrice;
+                    priceDisplay.textContent = newTotal.toFixed(2) + ' €';
+                } else {
+                    // Reset to base price
+                    priceDisplay.textContent = basePrice.toFixed(2) + ' €';
+                }
+            });
+        }
+    });
+    </script>
 
 {% endblock %}
 

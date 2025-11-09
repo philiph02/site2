@@ -7,19 +7,27 @@ from wagtail import urls as wagtail_urls
 from wagtail.documents import urls as wagtaildocs_urls
 
 from search import views as search_views
-from home import views as home_views # Dieser Import ist schon da
+from home import views as home_views # This import is already here
 
 urlpatterns = [
     path("django-admin/", admin.site.urls),
     path("admin/", include(wagtailadmin_urls)),
     path("documents/", include(wagtaildocs_urls)),
     path("search/", search_views.search, name="search"),
-    path("cart/add/<int:product_id>/", home_views.add_to_cart, name="add_to_cart"),
     
-    #
-    # VVV DIESE ZEILE FEHLT BEI DIR! VVV
-    #
+    # Cart URLs
+    path("cart/add/<int:product_id>/", home_views.add_to_cart, name="add_to_cart"),
     path("cart/remove_one/<int:product_id>/", home_views.remove_one_from_cart, name="remove_one_from_cart"),
+
+    # Checkout URLs
+    path("checkout/", home_views.checkout_page, name="checkout"),
+    path("payment/", home_views.payment_page, name="payment"),
+    path("checkout/success/", home_views.checkout_success, name="checkout_success"),
+    path("checkout/done/", home_views.checkout_done_page, name="checkout_done"),
+
+    # NEW Authentication URLs
+    path("login/", home_views.login_view, name="login_view"),
+    path("logout/", home_views.logout_view, name="logout_view"),
 ]
 
 
@@ -32,6 +40,6 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns = urlpatterns + [
-    # ... (Wagtail-URL-Teil) ...
+    # Wagtail's page serving mechanism must be LAST
     path("", include(wagtail_urls)),
 ]

@@ -24,13 +24,55 @@
 
         <link rel="stylesheet" type="text/css" href="{% static 'css/site2.css' %}">
         
-        {# Dieser Block lädt Shop-CSS ODER Photography-CSS #}
+        {# This block loads Shop CSS OR Photography CSS #}
         {% block extra_head %}
         {% endblock %}
+
+        <style>
+            .django-messages {
+                position: fixed;
+                top: 8rem; /* Below the header */
+                right: 1.5rem;
+                z-index: 2000; /* Above everything */
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+                width: 300px;
+            }
+            .django-messages li {
+                display: block; /* Ensure it's visible */
+                padding: 1rem 1.5rem;
+                margin-bottom: 1rem;
+                border-radius: .5rem;
+                color: #fff;
+                font-weight: var(--font-medium);
+                box-shadow: 0 4px 12px hsla(0, 0%, 0%, 0.2);
+                background-color: var(--title-color); /* Default/Info */
+                opacity: 1;
+                transition: opacity 0.5s ease, transform 0.5s ease;
+            }
+            .django-messages li.success {
+                background-color: hsl(142, 69%, 45%); /* Green */
+            }
+            .django-messages li.error {
+                background-color: hsl(0, 80%, 60%); /* Red */
+            }
+            .django-messages li.warning {
+                background-color: hsl(45, 100%, 50%); /* Yellow */
+            }
+        </style>
     </head>
 
     <body class="{% block body_class %}{% endblock %}">
         {% wagtailuserbar %}
+
+        {% if messages %}
+            <ul class="django-messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
 
         <header class="header" id="header">
             <nav class="nav container">
@@ -60,10 +102,21 @@
                 </div>
         
                 <div class="nav__btns">
-                    <div class="login__toggle" id="login-button">
-                        <i class="bx bx-user"></i>
-                    </div>
-                    <div class="nav__shop" id="cart-shop">
+                    
+                    {% comment %}
+                    {% if user.is_authenticated %}
+                        <div class="nav__user-info" style="display: flex; align-items: center; gap: 1rem; color: var(--title-color);">
+                            <a href="{% url 'logout_view' %}" title="Logout">
+                                <i class="bx bx-log-out" style="font-size: 1.5rem; cursor: pointer;"></i>
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="login__toggle" id="login-button" title="Login">
+                            <i class="bx bx-user"></i>
+                        </div>
+                    {% endif %}
+                    {% endcomment %}        
+                    <div class="nav__shop" id="cart-shop" title="Cart">
                         <i class="bx bx-shopping-bag"></i>
                         {% if cart_total_count > 0 %}
                             <span class="cart-count">{{ cart_total_count }}</span>
@@ -77,7 +130,36 @@
         </header>
 
 
+{% comment %}
+        <div class="login" id="login">
+            <i class="bx bx-x login__close" id="login-close"></i>
+            <h2 class="login__title-center">Login</h2>
 
+            <form action="{% url 'login_view' %}" method="POST" class="login__form grid">
+                {% csrf_token %} <div class="login__content">
+                    <label for="id_username" class="login__label">Username</label>
+                    <input type="text" name="username" id="id_username" class="login__input" required>
+                </div>
+                
+                <div class="login__content">
+                    <label for="id_password" class="login__label">Password</label>
+                    <input type="password" name="password" id="id_password" class="login__input" required>
+                </div>
+                
+                <div>
+                    <button type="submit" class="button">Sign in</button>
+                </div>
+            </form>
+            
+            <div>
+                {% if registration_page %}
+                    <p class="signup">Not a member? <a href="{% pageurl registration_page %}">Sign up now</a></p>
+                {% else %}
+                    <p class="signup"><span>Registration not available</span></p>
+                {% endif %}
+            </div>
+        </div>
+        {% endcomment %}
 
         <div class="cart" id="cart">
             <i class="bx bx-x cart__close" id="cart-close"></i>
@@ -93,21 +175,27 @@
                         <div class="cart__details">
                             <h3 class="cart__title">{{ item.product.title }}</h3>
                             <span class="cart__price">{{ item.item_total }} €</span>
-                            <span class="cart__quantity">Menge: {{ item.quantity }}</span>
+                            <span class="cart__quantity">Items: {{ item.quantity }}</span>
                             <a href="{% url 'remove_one_from_cart' product_id=item.product.id %}" class="cart__amount-trash-link" title="Remove one">
                                 <i class="bx bx-trash-alt cart__amount-trash"></i>
                             </a>
                         </div>
                     </article>
                 {% empty %}
-                    <p style="padding: 20px; text-align: center;">Dein Warenkorb ist leer.</p>
+                    <p style="padding: 20px; text-align: center;">Your cart is empty.</p>
                 {% endfor %}
             </div>
             <div class="cart__prices">
                 <span class="cart__prices-item">{{ cart_total_count }} item(s)</span>
                 <span class="cart__prices-total">{{ cart_total_price }} €</span>
             </div>
+            {% if cart_total_count > 0 %}
+            <div class="cart__checkout" style="padding: 1.5rem 0rem 1.5rem; text-align: center;">
+                <a href="{% url 'checkout' %}" class="button" style="width: 100%;">Checkout</a>
+            </div>
+            {% endif %}
         </div>
+        
         {% block content %}{% endblock %}
 
         
@@ -117,8 +205,7 @@
                     <a href="#" class="footer__logo">
                          <img src="{% static 'home/assets/images/logo_cumulophib.png' %}" alt="Logo" style="height: 2.5em; vertical-align: middle; margin-right: 0.5em;">
                     </a>
-                    <p class="footer__description"> Danke! </p>
-                    <div class="footer__social">
+                    <p class="footer__description"> Thank You! </p> <div class="footer__social">
            
                         <a href="https://www.instagram.com/cumulophib/" class="footer__social-link"><i class="bx bxl-instagram-alt"></i></a>
                     </div>
@@ -153,6 +240,18 @@
                     button.addEventListener('click', () => {
                         sessionStorage.setItem('keepCartOpen', 'true');
                     });
+                });
+
+                // NEW: Auto-close success/error messages after 5 seconds
+                const messages = document.querySelectorAll('.django-messages li');
+                messages.forEach((message, index) => {
+                    setTimeout(() => {
+                        message.style.opacity = '0';
+                        message.style.transform = 'translateX(100%)';
+                        setTimeout(() => {
+                            if (message) message.remove();
+                        }, 500); // Remove from DOM after fade out
+                    }, 5000 + (index * 500)); // Stagger removal
                 });
             });
             </script>
