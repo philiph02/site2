@@ -31,3 +31,5 @@ static/
 # Betriebssystem
 .DS_Store
 Thumbs.db
+
+dev.py
