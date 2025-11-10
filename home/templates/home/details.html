@@ -400,9 +400,11 @@
 {% block extra_js %}
     {{ block.super }} {# Inherits scripts from base.html #}
 
+    <!-- Your existing JS files -->
     <script src="{% static 'home/assets_shop/js/swiper-bundle.min.js' %}?v=1.0.9"></script>
     <script src="{% static 'home/assets_shop/js/main.js' %}?v=1.0.9"></script>
 
+    <!-- NEW JAVASCRIPT TO UPDATE PRICE (This is correct) -->
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         const priceDisplay = document.getElementById('product-price');
@@ -427,6 +429,9 @@
         }
     });
     </script>
+    <!-- === END OF NEW JAVASCRIPT === -->
+
+    <!-- LIGHTBOX SCRIPT (from your original file, moved here) -->
     <script>
         const productItems = document.querySelectorAll(".product__img"),
               totalProductItems = productItems.length,
@@ -469,7 +474,6 @@
         }
 
         function changeItem() {
-            // This script looks for the 'img' tag inside the clicked '.product__img'
             let imgTag = productItems[itemIndex].querySelector("img");
             if (imgTag) {
                 let imgSrc = imgTag.getAttribute("src");
