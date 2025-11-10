@@ -249,7 +249,7 @@
                     {# --- DYNAMISCH: Preise --- #}
                     <div class="details__prices">
                         {% if page.price %}
-                            <span class="details__price">{{ page.price }} €</span>
+                            <span class="details__price" id="product-price">{{ page.price }} €</span>
                         {% endif %}
                         
                         {# Zeigt Rabattpreis nur an, wenn er im Admin eingetragen wurde #}
@@ -259,7 +259,6 @@
                         {% endif %}
                     </div>
 
-                    {# --- DYNAMISCH: Beschreibung --- #}
                     <div class="details__description">
                         <!-- 1. Your new A2 size description -->
                         <p style="margin-bottom: var(--mb-0-75);">All prints come in A2 format (42.0 x 59.4 cm).</p>
@@ -276,10 +275,12 @@
                         <!-- 3. NEW: Add-on Checkbox (only shows if price is set) -->
                         {% if page.frame_addon_price %}
                         <label for="add_frame_checkbox" class="product-addon-option">
-                            <input type="checkbox" name="add_frame" id="add_frame_checkbox" value="{{ page.frame_addon_price }}">
-                            <!-- This label is now connected to the input -->
-                            + With high-quality A2 Frame
-                            <span>+ {{ page.frame_addon_price }} €</span>
+                            <!-- This is the hidden, real checkbox -->
+                            <input type="checkbox" name="add_frame" id="add_frame_checkbox" value="true">
+                            <!-- This is the fake one we see and style -->
+                            <span class="fake-checkbox"></span>
+                            <!-- This is the label text -->
+                            Add Frame
                         </label>
                         {% endif %}
 
@@ -508,27 +509,27 @@
     <script src="{% static 'home/assets_shop/js/main.js' %}?v=1.0.9"></script>
     <link rel="stylesheet" href="{% static 'home/assets_shop/css/style.css' %}?v=1.0.9">
 
-    {{ block.super }}
+    {{ block.super }} {# This keeps your existing scripts from base.html #}
 
+    <!-- === NEW JAVASCRIPT TO UPDATE PRICE === -->
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         const priceDisplay = document.getElementById('product-price');
         const frameCheckbox = document.getElementById('add_frame_checkbox');
         
-        // Get base price from the page text
+        // Your base price (e.g., 39.99)
         const basePrice = parseFloat("{{ page.price }}");
+        
+        // Your final framed price (59.99)
+        const framedPrice = 59.99; 
 
         if (priceDisplay && frameCheckbox) {
-            // Get the add-on price from the checkbox value
-            const frameAddonPrice = parseFloat(frameCheckbox.value);
-
             frameCheckbox.addEventListener('change', function() {
                 if (this.checked) {
-                    // Add addon price to base price
-                    const newTotal = basePrice + frameAddonPrice;
-                    priceDisplay.textContent = newTotal.toFixed(2) + ' €';
+                    // SET price TO 59.99
+                    priceDisplay.textContent = framedPrice.toFixed(2) + ' €';
                 } else {
-                    // Reset to base price
+                    // SET price BACK to base
                     priceDisplay.textContent = basePrice.toFixed(2) + ' €';
                 }
             });
