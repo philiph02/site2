@@ -20,17 +20,14 @@ img/
 image/
 images/
 
-# Statische Dateien (von 'collectstatic')
-# Dieser Ordner wird in der Produktion erstellt und sollte nicht in Git sein.
-# Deine Quell-Bilder (wie in /home/static/home/assets_shop/img/) sind davon NICHT betroffen!
-static/ 
-
-# VS Code
 .vscode/
 
 # Betriebssystem
 .DS_Store
 Thumbs.db
 
+dev.py
+
+security/
 
 .env

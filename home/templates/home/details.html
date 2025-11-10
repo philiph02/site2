@@ -4,71 +4,12 @@
 {% block extra_head %}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
     <link rel="stylesheet" href="{% static 'home/assets_shop/css/swiper-bundle.min.css' %}">
-    <link rel="stylesheet" href="{% static 'home/assets_shop/css/style.css' %}">
-    <link rel="stylesheet" href="{% static 'home/assets_shop/css/colors/color-1.css' %}">
-
-    {# DIESER LINK WAR VORHER AM ENDE DER DATEI AUSSERHALB VON ALLEM #}
+    
     <link rel="stylesheet" href="{% static 'home/assets_shop/css/style.css' %}?v=1.0.9">
+    
+    <link rel="stylesheet" href="{% static 'home/assets_shop/css/colors/color-1.css' %}">
 {% endblock %}
-
 {% block content %}
-<!-- <header class="header" id="header">
-    <nav class="nav container">
-        {# Dieser Link geht zur Shop-Hauptseite (index_shop.html) #}
-        {% if index_shop_page %}
-            <a href="{% pageurl index_shop_page %}" class="nav__logo" style="display: flex; align-items: center;">
-                <img src="{% static 'home/assets/images/logo_cumulophib.png' %}" alt="Logo" style="height: 2.5em; vertical-align: middle; margin-right: 0.5em;">
-            </a>
-        {% else %}
-            {# Fallback, falls die Variable nicht da ist #}
-            <a href="/" class="nav__logo" style="display: flex; align-items: center;">
-                <img src="{% static 'home/assets/images/logo_cumulophib.png' %}" alt="Logo" style="height: 2.5em; vertical-align: middle; margin-right: 0.5em;">
-            </a>
-        {% endif %}
-
-        <div class="nav__menu" id="nav-menu">
-            <ul class="nav__list">
-                {# 'active-link' entfernt, da wir auf einer Detailseite sind #}
-                {% if index_shop_page %}
-                    <li class="nav__item"><a href="{% pageurl index_shop_page %}" class="nav__link">Shop</a></li>
-                {% endif %}
-                
-                {% if index_page %}
-                    <li class="nav__item"><a href="{% pageurl index_page %}" class="nav__link ">Home</a></li>
-                {% endif %}
-                {% if about_page %}
-                    <li class="nav__item"><a href="{% pageurl about_page %}" class="nav__link">About</a></li>
-                {% endif %}
-                {% if blog_page %}
-                    <li class="nav__item"><a href="{% pageurl blog_page %}" class="nav__link">Blog</a></li>
-                {% endif %}
-                {% if faq_page %}
-                    <li class="nav__item"><a href="{% pageurl faq_page %}" class="nav__link">Faq's</a></li>
-                {% endif %}
-                {% if contact_page %}
-                    <li class="nav__item"><a href="{% pageurl contact_page %}" class="nav__link">Contact</a></li>
-                {% endif %}
-            </ul>
-            <div class="nav__close" id="nav-close">
-                <i class="bx bx-x"></i>
-            </div>
-        </div>
-        <div class="nav__btns">
-            <div class="login__toggle" id="login-button">
-                <i class="bx bx-user"></i>
-            </div>
-            <div class="nav__shop" id="cart-shop">
-                <i class="bx bx-shopping-bag"></i>
-                {% if cart_total_count > 0 %}
-                    <span class="cart-count">{{ cart_total_count }}</span>
-                {% endif %}
-            </div>
-            <div class="nav__toggle" id="nav-toggle">
-                <i class="bx bx-grid-alt"></i>
-            </div>
-        </div>
-    </nav>
-</header> -->
 
 <!--=============== CART ===============-->
 
@@ -206,64 +147,31 @@
         <section class="details section container">
             <h2 class="breadcrumb__title">Details Page</h2>
             
-            {# --- DYNAMISCH: Breadcrumb --- #}
-            {# Verlinkt zur übergeordneten Seite (deine index_shop.html) und zeigt den Produkttitel #}
             <h3 class="breadcrumb__subtitle"><a href="{% pageurl page.get_parent %}">Shop</a> > <span>{{ page.title }}</span></h3>
 
             <div class="details__container grid">
                 <div class="product__images grid">
                     
-                    {# --- DYNAMISCH: Haupt-Produktbild --- #}
                     {% if page.product_image %}
                         <div class="product__img">
-                            {# Du kannst hier ein 'Tag' Feld hinzufügen, wenn du eins im Modell hast #}
-                            {# <div class="details__img-tag">New</div> #}
                             {% image page.product_image height-1000 alt=page.title %}
                         </div>
                     {% endif %}
-
-        
                 </div>
 
                 <div class="product__info">
-                    {# --- DYNAMISCH: Untertitel (z.B. Orientierung oder Kategorie) --- #}
                     {% if page.orientation %}
                         <p class="details__subtitle">{{ page.orientation | title }}</p>
                     {% endif %}
                     
-                    {# --- DYNAMISCH: Produkttitel --- #}
                     <h3 class="details__title">{{ page.title }}</h3>
 
-                    <!-- {# Rating (bleibt statisch, da nicht im Modell) #}
-                    <div class="rating">
-                        <div class="stars">
-                            <i class="bx bxs-star"></i>
-                            <i class="bx bxs-star"></i>
-                            <i class="bx bxs-star"></i>
-                            <i class="bx bxs-star"></i>
-                            <i class="bx bx-star"></i>
-                        </div>
-                        <span class="reviews__count">40 + Reviews</span>
-                    </div> -->
-
-                    {# --- DYNAMISCH: Preise --- #}
                     <div class="details__prices">
-                        {% if page.price %}
-                            <span class="details__price" id="product-price">{{ page.price }} €</span>
-                        {% endif %}
-                        
-                        {# Zeigt Rabattpreis nur an, wenn er im Admin eingetragen wurde #}
-                        {% if page.discount_price %}
-                            <span class="details__discount">{{ page.discount_price }} €</span>
-                            {# <span class="discount__percentage">50% OFF</span> #}
-                        {% endif %}
+                        <span class="details__price" id="product-price">{{ page.price }} €</span>
                     </div>
 
-                    <div class="details__description">
-                        <!-- 1. Your new A2 size description -->
+                    <div class="details__description" style="margin-top: var(--mb-2);">
                         <p style="margin-bottom: var(--mb-0-75);">All prints come in A2 format (42.0 x 59.4 cm).</p>
-
-                        <!-- 2. Your original description text -->
                         <div class="simple-description">
                             {{ page.description_text | linebreaks }}
                         </div>
@@ -272,28 +180,21 @@
                     <form action="{% url 'add_to_cart' product_id=page.id %}" method="POST" id="add-to-cart-form">
                         {% csrf_token %}
 
-                        <!-- 3. NEW: Add-on Checkbox (only shows if price is set) -->
                         {% if page.frame_addon_price %}
                         <label for="add_frame_checkbox" class="product-addon-option">
-                            <!-- This is the hidden, real checkbox -->
                             <input type="checkbox" name="add_frame" id="add_frame_checkbox" value="true">
-                            <!-- This is the fake one we see and style -->
                             <span class="fake-checkbox"></span>
-                            <!-- This is the label text -->
                             Add Frame
                         </label>
                         {% endif %}
-
-                        <!-- 4. Original Add to Cart Button -->
+                        
                         <button type="submit" class="button" id="add-to-cart-btn" style="width: 100%;">Add To Cart</button>
                     </form>
-
-                </div>
+                    </div>
             </div>
         </section>
 
-        <!--=============== RELATED PRODUCTS ===============-->
-    <section class="related__products section">
+        <section class="related__products section">
         <h2 class="section__title">Related Products</h2>
 
         <div class="new__container container">
@@ -301,15 +202,11 @@
                 <div class="swiper-wrapper">
                     
                     {% for product in related_products %}
-                    
                     <div class="shop__content swiper-slide">
-                        
                         <a href="{% pageurl product %}" class="related-product__main-link">
-                            
                             {% if product.product_image %}
                                 {% image product.product_image width-300 alt=product.title class="shop__img" %}
                             {% endif %}
-                            
                             <h3 class="shop__title">{{ product.title }}</h3>
                         </a>
                         
@@ -329,14 +226,13 @@
                             <i class="bx bx-cart-alt shop__icon"></i>
                         </a>
                     </div>
-                    
                     {% endfor %}
                     
                 </div>
             </div>
         </div>
     </section>
-    </main>
+</main>
     <!--=============== FOOTER ===============-->
 <footer class="footer section">
         <div class="footer__container container grid">
@@ -501,17 +397,12 @@
 {% endblock %}
 
 
-{# --- NEUER BLOCK FÜR JAVASCRIPT --- #}
-{# Dieser Block wird in den 'extra_js' Block in 'base.html' geladen #}
 {% block extra_js %}
-    {# Diese Skripte waren vorher FALSCH platziert (außerhalb von allem) #}
+    {{ block.super }} {# Inherits scripts from base.html #}
+
     <script src="{% static 'home/assets_shop/js/swiper-bundle.min.js' %}?v=1.0.9"></script>
     <script src="{% static 'home/assets_shop/js/main.js' %}?v=1.0.9"></script>
-    <link rel="stylesheet" href="{% static 'home/assets_shop/css/style.css' %}?v=1.0.9">
 
-    {{ block.super }} {# This keeps your existing scripts from base.html #}
-
-    <!-- === NEW JAVASCRIPT TO UPDATE PRICE === -->
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         const priceDisplay = document.getElementById('product-price');
@@ -536,6 +427,62 @@
         }
     });
     </script>
+    <script>
+        const productItems = document.querySelectorAll(".product__img"),
+              totalProductItems = productItems.length,
+              lightbox = document.querySelector(".lightbox"),
+              lightboxImg = lightbox.querySelector(".lightbox__img"),
+              lightboxClose = lightbox.querySelector(".lightbox__close"),
+              lightboxCounter = lightbox.querySelector(".caption__counter");
+        let itemIndex = 0;
 
+        for(let i=0; i<totalProductItems; i++) {
+            productItems[i].addEventListener("click", function() {
+                itemIndex=i;
+                changeItem();
+                toggleLightbox();
+            })
+        }
+
+        function nextItem() {
+            if(itemIndex === totalProductItems-1) {
+                itemIndex=0;
+            }
+            else{
+                itemIndex++
+            }
+            changeItem()
+        }
+
+        function prevItem() {
+            if(itemIndex === 0) {
+                itemIndex=totalProductItems-1;
+            }
+            else{
+                itemIndex--
+            }
+            changeItem()
+        }
+
+        function toggleLightbox() {
+            lightbox.classList.toggle("open");
+        }
+
+        function changeItem() {
+            // This script looks for the 'img' tag inside the clicked '.product__img'
+            let imgTag = productItems[itemIndex].querySelector("img");
+            if (imgTag) {
+                let imgSrc = imgTag.getAttribute("src");
+                lightboxImg.src = imgSrc;
+                lightboxCounter.innerHTML = (itemIndex + 1) + " of " + totalProductItems;
+            }
+        }
+
+        // close lightbox
+        lightbox.addEventListener("click", function(event) {
+            if(event.target === lightboxClose || event.target === lightbox) {
+                toggleLightbox()
+            }
+        })
+    </script>
 {% endblock %}
-
