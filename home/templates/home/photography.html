@@ -2,7 +2,7 @@
 {% load static wagtailcore_tags %}
 {% load wagtailimages_tags %}
 
-{# SCHRITT 1: CSS. Ich habe die ::after-Regeln entfernt und deine neuen .custom-play-button-Stile hinzugefügt. #}
+{# SCHRITT 1: CSS (Ich habe die Galerie-Styles hierher verschoben) #}
 {% block extra_head %}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
     <link rel="stylesheet" href="{% static 'home/assets_shop/css/swiper-bundle.min.css' %}">
@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{% static 'home/assets_shop/css/colors/color-1.css' %}">
     
     <style>
+        /* --- Tab-System --- */
         .tab-nav-container { text-align: center; margin-bottom: var(--mb-2-5); }
         .tab-button { background-color: var(--container-color); color: var(--title-color); border: 2px solid var(--scroll-bar-color); padding: 1rem 1.75rem; border-radius: .5rem; font-weight: var(--font-medium); cursor: pointer; transition: .3s; margin: 0 .5rem; }
         .tab-button.active { background: #575757; color: #ffffff; border-color: #575757; }
@@ -17,11 +18,7 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         
-        /*
-         * ======================================
-         * NEUES VIDEO-PLAYER STYLING (BASIEREND AUF DEINEM BEISPIEL)
-         * ======================================
-        */
+        /* --- Video-Player --- */
         .video-player-placeholder {
             width: 100%; max-width: 560px; height: 315px; background-color: #000;
             border-radius: .5rem; margin: 0 auto var(--mb-1-5); position: relative;
@@ -29,33 +26,42 @@
             cursor: pointer;
         }
         
-        /* Dein neuer, nicht-transparenter Button-Stil */
         .custom-play-button {
-            width: 80px; /* 2em war zu klein, 80px ist eine gute Größe */
-            height: auto;
-            position: absolute;
-            top: 50%;
-            left: 50%;
+            width: 80px; height: auto; position: absolute;
+            top: 50%; left: 50%;
             transform: translate(-50%, -50%);
             z-index: 10;
             transition: transform 0.2s ease;
         }
-
-        /* Leichter Zoom-Effekt beim Hovern */
         .video-player-placeholder:hover .custom-play-button {
             transform: translate(-50%, -50%) scale(1.1);
         }
-
-        /* Versteckt den Play-Button, wenn das Video geladen wird */
         .video-player-placeholder.is-playing .custom-play-button {
             display: none;
             opacity: 0;
         }
+
+        /* * === FOTOGRAFIE-GALERIE STYLES ===
+         * (Diese waren vorher falsch platziert)
+        */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100&display=swap');
+        
+        .gallery { display: flex; flex-direction: column; gap: 1.5rem; }
+        .row { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; align-items: start; }
+        .pair { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; align-items: start; }
+        .image-with-text { display: flex; flex-direction: column; }
+        
+        .text { grid-column: 1 / span 2; text-align: center; margin-top: 0.5rem; }
+        .text-events { font-family: 'Roboto', sans-serif; font-weight: 100; font-size: 10rem; text-transform: uppercase; }
+        .text-portrait { font-family: 'Roboto', sans-serif; font-weight: 200; font-size: 3.3rem; text-transform: uppercase; text-align: center; margin-top: 1.5rem; }
+        
+        .gallery__box { background-color: var(--container-color); border-radius: 1rem; padding: 1rem; width: 100%; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .gallery__img { width: 100%; height: auto; display: block; border-radius: .5rem; }
     </style>
 {% endblock %}
 
 
-{# SCHRITT 2: Der Hauptinhalt mit den Tabs #}
+{# SCHRITT 2: Der korrigierte Inhaltsblock #}
 {% block content %}
 
 <div class="login" id="login">
@@ -88,58 +94,13 @@
 
     <section class="section container">
 
-
         <div class="tab-nav-container">
             <button class="tab-button active" data-target="#photography-content">Photography</button>
             <button class="tab-button" data-target="#videography-content">Videography</button>
         </div>
 
 
-<div id="photography-content" class="tab-content active">
-            <div class="new section" style="padding-top: 0;">
-                <div class="prints-swiper-wrapper" style="position: relative;">
-                    <div class="new__container container">
-                        <div class="swiper new-swiper">
-                            <div class="swiper-wrapper">
-
-                                <div class="new__content swiper-slide">
-                                    <img src="/media/images_photography/horizontal/photography_horizontal-5.jpg" alt="Photography Image 1" class="new__img" />
-                                </div>
-                                <div class="new__content swiper-slide">
-                                    <img src="/media/images_photography/horizontal/photography_horizontal-3.jpg" alt="Photography Image 2" class="new__img" />
-                                </div>
-                                <div class="new__content swiper-slide">
-                                    <img src="/media/images_photography/vertical/photography_vertical-11.jpg" alt="Photography Image 3" class="new__img" />
-                                </div>
-                                <div class="new__content swiper-slide">
-                                    <img src="/media/images_photography/vertical/photography_vertical-2.jpg" alt="Photography Image 4" class="new__img" />
-                                </div>
-                                <div class="new__content swiper-slide">
-                                    <img src="/media/images_photography/squared/photography_squared-6.jpg" alt="Photography Image 5" class="new__img" />
-                                </div>
-                                <div class="new__content swiper-slide">
-                                    <img src="/media/images_photography/vertical/photography_vertical-8.jpg" alt="Photography Image 6" class="new__img" />
-                                </div>
-                                <div class="new__content swiper-slide">
-                                    <img src="/media/images_photography/horizontal/photography_horizontal-1.jpg" alt="Photography Image 7" class="new__img" />
-                                </div>
-                                <div class="new__content swiper-slide">
-                                    <img src="/media/images_photography/squared/photography_squared-5.jpg" alt="Photography Image 8" class="new__img" />
-                                </div>
-                                <div class="new__content swiper-slide">
-                                    <img src="/media/images_photography/horizontal/photography_horizontal-2.jpg" alt="Photography Image 9" class="new__img" />
-                                </div>
-                                </div>
-                            <div class="swiper-pagination prints-pagination"></div>
-                        </div>
-                    </div>
-                    <div class="swiper-button-prev"></div>
-                    <div class="swiper-button-next"></div>
-                </div>
-            </div>
-        </div>
-
-<div id="videography-content" class="tab-content">
+        <div id="photography-content" class="tab-content active">
             
             <div class="container" style="max-width: 968px; text-align: center; margin-bottom: 3rem;">
                 <h3 style="font-size: var(--h2-font-size); color: var(--title-color); margin-bottom: var(--mb-1);">
@@ -147,11 +108,79 @@
                 </h3>
 
                 <p style="max-width: 700px; margin: 0 auto var(--mb-2-5);">
-                    Producing videos that don't just get seen — they get remembered.
+                    Producing content that don't just get seen — they get remembered.
                 </p>
 
                 <hr style="border: 0; border-top: 1px solid var(--scroll-bar-color); margin-bottom: var(--mb-2-5);">
 
+                <div style="text-align: left; max-width: 500px; margin: 0 auto var(--mb-2-5); display: inline-block;">
+                    <ul style="list-style: none; padding-left: 0;">
+
+                        <li style="display: flex; align-items: center; margin-bottom: var(--mb-1);">
+                            <i class='bx bx-calendar-event' style="font-size: 1.5rem; color: var(--title-color); margin-right: var(--mb-0-75);"></i>
+                            <span>Event Photography</span>
+                        </li>
+                        <li style="display: flex; align-items: center; margin-bottom: var(--mb-1);">
+                            <i class='bx bx-camera' style="font-size: 1.5rem; color: var(--title-color); margin-right: var(--mb-0-75);"></i>
+                            <span>Portraits & Weddings</span>
+                        </li>
+                        <li style="display: flex; align-items: center;">
+                            <i class='bx bx-store-alt' style="font-size: 1.5rem; color: var(--title-color); margin-right: var(--mb-0-75);"></i>
+                            <span>Product & Branding</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <hr style="border: 0; border-top: 1px solid var(--scroll-bar-color); margin-bottom: var(--mb-2-5);">
+            </div>
+            
+            <div class="new section" style="padding-top: 0;">
+                <div class="new__container container">
+                    <div class="gallery">
+
+                        <div class="row">
+                            <div class="pair">
+                                <div class="gallery__box"> <img src="/media/images_photography/horizontal/photography_horizontal-5.jpg" alt="Photography Image 1" class="gallery__img" /> </div>
+                                <div class="gallery__box"> <img src="/media/images_photography/horizontal/photography_horizontal-3.jpg" alt="Photography Image 2" class="gallery__img" /> </div>
+                                <div class="text text-events">EVENTS</div>
+                            </div>
+                            <div class="gallery__box"> <img src="/media/images_photography/vertical/photography_vertical-11.jpg" alt="Photography Image 3" class="gallery__img" /> </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="pair">
+                                <div class="gallery__box"> <img src="/media/images_photography/vertical/photography_vertical-2.jpg" alt="Photography Image 4" class="gallery__img" /> </div>
+                                <div class="image-with-text">
+                                <div class="gallery__box"> <img src="/media/images_photography/squared/photography_squared-6.jpg" alt="Photography Image 5" class="gallery__img" /> </div>
+                                <div class="text-portrait">PORTRAITS</div>
+                                </div>
+                            </div>
+                            <div class="gallery__box"> <img src="/media/images_photography/vertical/photography_vertical-8.jpg" alt="Photography Image 6" class="gallery__img" /> </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="pair">
+                                <div class="gallery__box"> <img src="/media/images_photography/horizontal/photography_horizontal-1.jpg" alt="Photography Image 7" class="gallery__img" /> </div>
+                                <div class="gallery__box"> <img src="/media/images_photography/squared/photography_squared-5.jpg" alt="Photography Image 8" class="gallery__img" /> </div>
+                            </div>
+                            <div class="gallery__box"> <img src="/media/images_photography/horizontal/photography_horizontal-2.jpg" alt="Photography Image 9" class="gallery__img" /> </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="videography-content" class="tab-content">
+            
+            <div class="container" style="max-width: 968px; text-align: center; margin-bottom: 3rem;">
+                <h3 style="font-size: var(--h2-font-size); color: var(--title-color); margin-bottom: var(--mb-1);">
+                    Everyone Has a Story. I Help You Tell It.
+                </h3>
+                <p style="max-width: 700px; margin: 0 auto var(--mb-2-5);">
+                    Producing content that don't just get seen — they get remembered.
+                </p>
+                <hr style="border: 0; border-top: 1px solid var(--scroll-bar-color); margin-bottom: var(--mb-2-5);">
                 <div style="text-align: left; max-width: 500px; margin: 0 auto var(--mb-2-5); display: inline-block;">
                     <ul style="list-style: none; padding-left: 0;">
                         <li style="display: flex; align-items: center; margin-bottom: var(--mb-1);">
@@ -168,9 +197,7 @@
                         </li>
                     </ul>
                 </div>
-
                 <hr style="border: 0; border-top: 1px solid var(--scroll-bar-color); margin-bottom: var(--mb-2-5);">
-
                 <h3 class="section__title" style="font-size: var(--h2-font-size); margin-bottom: 2rem;">Recent Projects</h3>
             </div>
 
@@ -183,7 +210,7 @@
                          data-poster-src="/media/video/aks_muthgasse_qhd_thumbnail.jpg"
                          data-video-src="/media/video/aks_muthgasse_qhd.mp4">
                         
-                        <img class="custom-play-button" src="https://www.pngitem.com/pimgs/b/255-2554901_recording-icon-png.png" alt="Play Video">
+                        <img class="custom-play-button" src="/media/rumpelkiste/255-2554901_recording-icon-png.png" alt="Play Video">
                     </div>
                     <p class="steps__card-description" style="text-align: center; max-width: 500px; margin: 1rem auto 0;">
                         This film chronicles the construction of Carré Muthgasse. It merges sweeping cinematic aerials with insightful architect interviews to document the project's evolution.
@@ -198,7 +225,7 @@
                          data-poster-src="/media/video/aks_showroom_qhd_thumbnail.jpg"
                          data-video-src="/media/video/aks_showroom_qhd.mp4">
                         
-                        <img class="custom-play-button" src="https://www.pngitem.com/pimgs/b/255-2554901_recording-icon-png.png" alt="Play Video">
+                        <img class="custom-play-button" src="/media/rumpelkiste/255-2554901_recording-icon-png.png" alt="Play Video">
                     </div>
                     <p class="steps__card-description" style="text-align: center; max-width: 500px; margin: 1rem auto 0;">
                         A sensory tour of the Alukönigstahl Showroom. This film captures the unique atmosphere and intricate details, designed to make the superior product quality not just visible, but tangible.
@@ -217,7 +244,7 @@
 {% endblock %}
 
 
-{# SCHRITT 3: Das JavaScript ist dasselbe wie im vorherigen Schritt. Es funktioniert immer noch. #}
+{# SCHRITT 3: JavaScript (Bleibt unverändert) #}
 {% block extra_js %}
     {{ block.super }} {# Behält die globalen Skripte aus base.html #}
     
@@ -259,10 +286,8 @@
                         return;
                     }
 
-                    // Versteckt den .custom-play-button (durch Hinzufügen der CSS-Klasse)
                     this.classList.add('is-playing'); 
 
-                    // Ersetzt den Inhalt (inklusive des <img>-Buttons) durch den Video-Player
                     this.innerHTML = `
                         <video controls autoplay poster="${posterSrc}" style="width:100%; height:100%; border-radius: .5rem; object-fit: cover;">
                             <source src="${videoSrc}" type="video/mp4">

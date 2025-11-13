@@ -170,6 +170,8 @@
                         <span class="details__price" id="product-price">{{ page.price }} €</span>
                     </div>
 
+                    {% include "./components/option_toggle.html" with name="feature_toggle" value=item.feature_enabled label="Feature" %}
+
                     <div class="details__description" style="margin-top: var(--mb-2);">
                         <p style="margin-bottom: var(--mb-0-75);">All prints come in A2 format (42.0 x 59.4 cm).</p>
                         <div class="simple-description">

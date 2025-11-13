@@ -1,0 +1,39 @@
+<div class="option-toggle" role="group" aria-label="{{ label|default:'Option state' }}">
+  <label class="opt {% if not value %}is-active{% endif %}">
+    <input type="radio" name="{{ name }}" value="disabled" {% if not value %}checked{% endif %}>
+    <span>Disabled</span>
+  </label>
+
+  <label class="opt {% if value %}is-active{% endif %}">
+    <input type="radio" name="{{ name }}" value="enabled" {% if value %}checked{% endif %}>
+    <span>Enabled</span>
+  </label>
+</div>
+
+<style>
+.option-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .5rem;
+  max-width: 420px;
+}
+.opt {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #ccc;
+  border-radius: .5rem;
+  padding: .75rem 1rem;
+  cursor: pointer;
+  background: #f9f9f9;
+  transition: all 0.2s ease;
+}
+.opt.is-active {
+  background: #2b7cff;
+  color: #fff;
+  border-color: #2b7cff;
+  box-shadow: 0 0 6px rgba(43,124,255,0.4);
+  font-weight: 600;
+}
+</style>
