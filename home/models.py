@@ -6,10 +6,47 @@ from django.contrib.auth.models import User     # <-- ADD USER
 
 from wagtail.models import Page
 from wagtail.fields import RichTextField
-from wagtail.admin.panels import FieldPanel
 
-# Import the new form
-      # <-- ADD FORM IMPORT
+from wagtail.snippets.models import register_snippet # NEU
+from wagtail.admin.panels import FieldPanel, MultiFieldPanel, InlinePanel, FieldRowPanel # Stelle sicher, dass FieldRowPanel importiert ist
+
+
+# ======================================================================
+# NEUES SNIPPET FÜR GLOBALE PREISE
+# Du kannst diese Preise jetzt im Admin unter "Snippets" -> "Print Size Prices" verwalten
+# ======================================================================
+@register_snippet
+class PrintSizePrice(models.Model):
+    size_name = models.CharField(
+        max_length=100,
+        help_text="Name der Größe, z.B. 'A2' oder 'A3'"
+    )
+    base_price = models.DecimalField(
+        decimal_places=2, 
+        max_digits=10,
+        help_text="Grundpreis für diesen Druck (ohne Rahmen)"
+    )
+    frame_addon_price = models.DecimalField(
+        decimal_places=2, 
+        max_digits=10,
+        help_text="Zusätzlicher Preis für einen Rahmen"
+    )
+
+    panels = [
+        FieldPanel('size_name'),
+        FieldRowPanel([
+            FieldPanel('base_price'),
+            FieldPanel('frame_addon_price'),
+        ])
+    ]
+
+    def __str__(self):
+        # Zeigt im Admin z.B. "A2 (29.90 €)" an
+        return f"{self.size_name} ({self.base_price} €)"
+
+    class Meta:
+        verbose_name = "Druckgröße & Preis"
+        verbose_name_plural = "Druckgrößen & Preise"
 
 # --- 1. "About Me" Seite ---
 class HomePage(Page):
@@ -55,50 +92,90 @@ ORIENTATION_CHOICES = [
     ('other', 'Other'),
 ]
 
+# ======================================================================
+# PRODUCTPAGE MODELL AKTUALISIERT
+# ======================================================================
 class ProductPage(Page):
-    parent_page_types = ['home.IndexShopPage'] 
-    template = "home/details.html"
-    
-    description = RichTextField(blank=True)
-    description_text = models.TextField(
-        blank=True,
-        help_text="Einfacher Text für eine zusätzliche Beschreibung."
-    )
-    price = models.DecimalField(
-        max_digits=7, 
-        decimal_places=2, 
-        help_text="Price for the RAW A2 Print (e.g., 39.99)" # <-- Updated help text
-    )
-
-    frame_addon_price = models.DecimalField(
-        max_digits=7, 
-        decimal_places=2, 
-        blank=True, 
-        null=True, 
-        help_text="ADD-ON price for the A2 Frame (e.g., 20.00). This will be added to the base price."
-    )
-
+    # Diese Felder bleiben gleich
     product_image = models.ForeignKey(
-        'wagtailimages.Image',
+        "wagtailimages.Image",
         null=True,
-        blank=True,
+        blank=False,
         on_delete=models.SET_NULL,
-        related_name='+'
+        related_name="+",
+        help_text="Bild des Produkts"
     )
     orientation = models.CharField(
-        max_length=10,
-        choices=ORIENTATION_CHOICES,
-        default='horizontal'
+        max_length=20, 
+        choices=[('horizontal', 'Horizontal'), ('vertical', 'Vertical'), ('squared', 'Squared')],
+        default='horizontal',
+        help_text="Ausrichtung des Bildes"
+    )
+    description_text = models.TextField(
+        blank=True,
+        help_text="Einfache Textbeschreibung"
     )
     
+    # NEU: Verknüpfung zum Preis-Snippet
+    # Die alten Felder 'price' und 'frame_addon_price' werden entfernt.
+    print_size = models.ForeignKey(
+        'home.PrintSizePrice',
+        null=True,
+        blank=False,
+        on_delete=models.SET_NULL,
+        related_name='+',
+        verbose_name="Druckgröße und Preis",
+        help_text="Wähle die Größe, um den Preis automatisch festzulegen."
+    )
+
+    # --- Wagtail Admin Panels ---
     content_panels = Page.content_panels + [
-        FieldPanel('description'),
-        FieldPanel('description_text'),
-        FieldPanel('price'),
-        FieldPanel('frame_addon_price'),  # <-- ADD THIS LINE
-        FieldPanel('product_image'),
-        FieldPanel('orientation'),
+        MultiFieldPanel([
+            FieldPanel("product_image"),
+            FieldPanel("orientation"),
+            FieldPanel("print_size"), # NEUES PANEL (ersetzt die alten Preis-Panels)
+        ], heading="Produkt-Details"),
+        FieldPanel("description_text"),
     ]
+
+    # --- Search Index ---
+    search_fields = Page.search_fields + [
+        index.SearchField('description_text'),
+        index.FilterField('orientation'),
+    ]
+
+    # ======================================================================
+    # NEUE @property METHODEN
+    # Diese geben die Preise aus dem Snippet an das Template weiter.
+    # Sie heißen 'price' und 'frame_addon_price', damit deine 
+    # alten Templates (shop, details) automatisch weiter funktionieren.
+    # ======================================================================
+    
+    @property
+    def price(self):
+        """ Gibt den Grundpreis aus dem verknüpften Snippet zurück. """
+        if self.print_size:
+            return self.print_size.base_price
+        return 0  # Fallback
+
+    @property
+    def frame_addon_price(self):
+        """ Gibt den Rahmen-Zusatzpreis aus dem Snippet zurück. """
+        if self.print_size:
+            return self.print_size.frame_addon_price
+        return 0  # Fallback
+    
+    # (Diese Eigenschaft ist von einer früheren Migration, stelle sicher, dass sie da ist)
+    @property
+    def related_products(self):
+        return ProductPage.objects.live().public().exclude(pk=self.pk).order_by('-first_published_at')[:5]
+
+    # Behält die übergeordnete Seite als Shop-Indexseite
+    parent_page_types = ['home.IndexShopPage']
+    subpage_types = []
+
+    class Meta:
+        verbose_name = "Produktseite"
 
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request, *args, **kwargs)
