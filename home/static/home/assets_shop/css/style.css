@@ -2175,3 +2175,4 @@ div.cart {
 .product-addon-option:has(input[type="checkbox"]:checked) {
   border-color: hsl(38, 100%, 70%);
 }
+

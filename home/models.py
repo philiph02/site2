@@ -4,6 +4,8 @@ from django.contrib.auth import login         # <-- ADD LOGIN
 from django.contrib import messages         # <-- ADD MESSAGES
 from django.contrib.auth.models import User     # <-- ADD USER
 
+from wagtail.search import index
+
 from wagtail.models import Page
 from wagtail.fields import RichTextField
 
@@ -96,7 +98,9 @@ ORIENTATION_CHOICES = [
 # PRODUCTPAGE MODELL AKTUALISIERT
 # ======================================================================
 class ProductPage(Page):
-    # Diese Felder bleiben gleich
+
+    template = "home/details.html"
+
     product_image = models.ForeignKey(
         "wagtailimages.Image",
         null=True,

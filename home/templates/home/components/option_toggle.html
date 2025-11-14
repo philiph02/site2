@@ -1,22 +1,13 @@
-{# 
-  Diese Komponente ist jetzt flexibler. Sie erwartet:
-  - name: (z.B. "add_frame")
-  - id_off: (z.B. "frame_no")
-  - id_on: (z.B. "frame_yes")
-  - label_off: (z.B. "Without Frame")
-  - label_on: (z.B. "With Frame")
-  - value: (Boolean, ob 'on' (true) or 'off' (false) standardmäßig aktiv ist)
-#}
 <div class="option-toggle" role="group" aria-label="{{ label|default:'Option state' }}">
   
   <label class="opt {% if not value %}is-active{% endif %}">
     <input type="radio" name="{{ name }}" id="{{ id_off }}" value="false" {% if not value %}checked{% endif %}>
-    <span>{{ label_off|default:"Disabled" }}</span>
+    <span>{{ label_off|default:"No Frame" }}</span>
   </label>
 
   <label class="opt {% if value %}is-active{% endif %}">
     <input type="radio" name="{{ name }}" id="{{ id_on }}" value="true" {% if value %}checked{% endif %}>
-    <span>{{ label_on|default:"Enabled" }}</span>
+    <span>{{ label_on|default:"With Frame" }}</span>
   </label>
 
 </div>
@@ -53,4 +44,40 @@
   border-color: #575757;
   font-weight: var(--font-medium);
 }
+
+/* HIER IST DIE LÖSUNG FÜR PROBLEM 1:
+   Der 'hässliche Auswahlpunkt' (der echte Radio-Button) wird versteckt.
+*/
+.opt input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
 </style>
+
+<script>
+    (function() {
+        // Findet alle Toggles auf der Seite
+        const toggles = document.querySelectorAll('.option-toggle');
+
+        toggles.forEach(toggle => {
+            const inputs = toggle.querySelectorAll('input[type="radio"]');
+            
+            inputs.forEach(input => {
+                // Fügt einen 'change'-Listener zu jedem Radio-Button hinzu
+                input.addEventListener('change', function() {
+                    
+                    // 1. Entfernt 'is-active' von allen labels in dieser Gruppe
+                    const labels = toggle.querySelectorAll('.opt');
+                    labels.forEach(label => label.classList.remove('is-active'));
+                    
+                    // 2. Fügt 'is-active' nur zum übergeordneten Label des geklickten Buttons hinzu
+                    if (this.checked) {
+                        this.parentElement.classList.add('is-active');
+                    }
+                });
+            });
+        });
+    })();
+</script>

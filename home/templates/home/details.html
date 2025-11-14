@@ -111,7 +111,7 @@
     </div>
 
     <!--=============== LOGIN ===============-->
-<div class="login" id="login">
+<!-- <div class="login" id="login">
         <i class="bx bx-x login__close" id="login-close"></i>
 
         <h2 class="login__title-center">Login</h2>
@@ -141,7 +141,7 @@
             {% endif %}
             </div>
         </form>
-    </div>
+    </div> -->
     <!--=============== MAIN ===============-->
 <main class="main">
         <section class="details section container">
@@ -170,7 +170,6 @@
                         <span class="details__price" id="product-price">{{ page.price }} €</span>
                     </div>
 
-                    {% include "./components/option_toggle.html" with name="feature_toggle" value=item.feature_enabled label="Feature" %}
 
                     <div class="details__description" style="margin-top: var(--mb-2);">
                         <p style="margin-bottom: var(--mb-0-75);">All prints come in A2 format (42.0 x 59.4 cm).</p>
@@ -179,19 +178,18 @@
                         </div>
                     </div>
 
-                    <form action="{% url 'add_to_cart' product_id=page.id %}" method="POST" id="add-to-cart-form">
-                        {% csrf_token %}
 
-                        {% if page.frame_addon_price %}
-                        <label for="add_frame_checkbox" class="product-addon-option">
-                            <input type="checkbox" name="add_frame" id="add_frame_checkbox" value="true">
-                            <span class="fake-checkbox"></span>
-                            Add Frame
-                        </label>
-                        {% endif %}
-                        
-                        <button type="submit" class="button" id="add-to-cart-btn" style="width: 100%;">Add To Cart</button>
-                    </form>
+                <form action="{% url 'add_to_cart' product_id=page.id %}" method="POST" id="add-to-cart-form">
+                    {% csrf_token %}
+
+                    {% if page.frame_addon_price > 0 %}
+
+                        {% include "home/components/option_toggle.html" with name="add_frame" id_off="frame_no" id_on="frame_yes" label_off="Without Frame" label_on="With Frame" value=False %}
+                    {% endif %}
+                    
+                    <button type="submit" class="button" id="add-to-cart-btn" style="width: 100%; margin-top: var(--mb-1-5);">Add To Cart</button>
+                </form>
+
                     </div>
             </div>
         </section>
@@ -398,42 +396,48 @@
 {# HIER ENDET DER 'content' BLOCK, DER IN 'base.html' EINGEFÜGT WIRD #}
 {% endblock %}
 
-
 {% block extra_js %}
     {{ block.super }} {# Inherits scripts from base.html #}
 
-    <!-- Your existing JS files -->
     <script src="{% static 'home/assets_shop/js/swiper-bundle.min.js' %}?v=1.0.9"></script>
     <script src="{% static 'home/assets_shop/js/main.js' %}?v=1.0.9"></script>
 
-    <!-- NEW JAVASCRIPT TO UPDATE PRICE (This is correct) -->
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         const priceDisplay = document.getElementById('product-price');
-        const frameCheckbox = document.getElementById('add_frame_checkbox');
         
-        // Your base price (e.g., 39.99)
-        const basePrice = parseFloat("{{ page.price }}");
-        
-        // Your final framed price (59.99)
-        const framedPrice = 59.99; 
+        // Holt die Radio-Buttons aus deiner option_toggle.html Komponente
+        const radioNoFrame = document.getElementById('frame_no');
+        const radioYesFrame = document.getElementById('frame_yes');
 
-        if (priceDisplay && frameCheckbox) {
-            frameCheckbox.addEventListener('change', function() {
+        // Deine Preise werden jetzt dynamisch aus dem Wagtail-Modell geladen
+        const basePrice = parseFloat("{{ page.price }}"); 
+        const frameAddonPrice = parseFloat("{{ page.frame_addon_price }}"); 
+        const framedPrice = basePrice + frameAddonPrice; // Berechnet den Gesamtpreis
+
+        if (priceDisplay && radioNoFrame && radioYesFrame) {
+            
+            // Event Listener für "Without Frame"
+            radioNoFrame.addEventListener('change', function() {
                 if (this.checked) {
-                    // SET price TO 59.99
-                    priceDisplay.textContent = framedPrice.toFixed(2) + ' €';
-                } else {
-                    // SET price BACK to base
                     priceDisplay.textContent = basePrice.toFixed(2) + ' €';
                 }
             });
+
+            // Event Listener für "With Frame"
+            radioYesFrame.addEventListener('change', function() {
+                if (this.checked) {
+                    // Preis auf den vollen Rahmenpreis setzen
+                    priceDisplay.textContent = framedPrice.toFixed(2) + ' €';
+                }
+            });
+        
+        } else if (priceDisplay) {
+             // Fallback, falls die Buttons nicht da sind (z.B. kein Rahmen-Addon)
+             priceDisplay.textContent = basePrice.toFixed(2) + ' €';
         }
     });
     </script>
-    <!-- === END OF NEW JAVASCRIPT === -->
-
-    <!-- LIGHTBOX SCRIPT (from your original file, moved here) -->
     <script>
         const productItems = document.querySelectorAll(".product__img"),
               totalProductItems = productItems.length,
