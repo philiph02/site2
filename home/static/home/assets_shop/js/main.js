@@ -65,8 +65,16 @@ if(loginClose) {
 var homeSwiper = new Swiper(".home-swiper", {
     spaceBetween: 30,
     loop: true,
+    
+    // --- ADDED AUTOPLAY CONFIGURATION ---
+    autoplay: {
+        delay: 7000, // 7 seconds
+        disableOnInteraction: true, // Stop autoplay if user swipes/clicks
+    },
+    // ------------------------------------
+
     pagination: {
-      el: ".home-pagination",  // <-- unique
+      el: ".home-pagination",
       clickable: true,
     },
 });

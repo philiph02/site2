@@ -4,167 +4,164 @@
 {% block extra_head %}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
     <link rel="stylesheet" href="{% static 'home/assets_shop/css/swiper-bundle.min.css' %}">
-    
     <link rel="stylesheet" href="{% static 'home/assets_shop/css/style.css' %}?v=1.0.9">
-    
     <link rel="stylesheet" href="{% static 'home/assets_shop/css/colors/color-1.css' %}">
+
+<style>
+    /* --- TOGGLE BUTTON STYLES --- */
+    .option-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem; 
+      max-width: 100%;
+      margin-bottom: 1rem; 
+      /* FIX FOR CUT-OFF: Add padding so badges have space to exist outside the grid */
+      padding: 8px; 
+    }
+    .opt {
+      position: relative; 
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--scroll-bar-color);
+      border-radius: .5rem;
+      padding: 1rem;
+      cursor: pointer;
+      background: var(--container-color);
+      color: var(--text-color);
+      transition: all 0.2s ease;
+      
+      /* FIX FOR CUT-OFF: Allow badge to stick out */
+      overflow: visible !important; 
+      z-index: 1; /* Ensure button is below badge */
+    }
+    .opt:hover {
+      border-color: var(--text-color);
+    }
+    .opt.is-active {
+      background: #575757;
+      color: #fff;
+      border-color: #575757;
+      font-weight: var(--font-medium);
+    }
+    /* Hide the actual radio button */
+    .opt input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    /* --- UPDATED BADGE DESIGN (Red Box, White Text) --- */
+    .shipping-badge {
+        position: absolute;
+        /* Adjust positioning to sit nicely on the corner */
+        top: -8px;
+        right: -8px;
+        
+        /* Red background & Red border */
+        background: #e74c3c; 
+        border: 1px solid #e74c3c;
+        
+        /* White Text */
+        color: white;      
+        
+        /* Smaller Size */
+        font-size: 0.62rem; 
+        font-weight: 600;
+        padding: 0.15rem 0.35rem;
+        border-radius: 0.2rem;
+        line-height: 1.2;
+        text-transform: uppercase; /* Optional: looks cleaner small */
+        
+        /* Visuals */
+        white-space: nowrap; 
+        box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        z-index: 10; /* Ensure it sits on top of everything */
+    }
+</style>
 {% endblock %}
+
 {% block content %}
 
 <div class="cart" id="cart">
-        <i class="bx bx-x cart__close" id="cart-close"></i>
-
-        <h2 class="cart__title-center">My Cart</h2>
-
-        <div class="cart__container">
-            <article class="cart__card">
-                <div class="cart__box">
-                    {# PFAD KORRIGIERT #}
-                    <img src="{% static 'home/assets_shop/img/cart-1.png' %}" alt="" class="cart__img">
-                </div>
-
-                <div class="cart__details">
-                    <h3 class="cart__title">Windbreaker</h3>
-                    <span class="cart__price">$12</span>
-
-                    <div class="cart__amount">
-                        <div class="cart__amount-content">
-                            <span class="cart__amount-box">
-                                <i class="bx bx-minus"></i>
-                            </span>
-
-                            <span class="cart__amount-number">1</span>
-
-                            <span class="cart__amount-box">
-                                <i class="bx bx-plus"></i>
-                            </span>
-                        </div>
-
-                        <i class="bx bx-trash-alt cart__amount-trash"></i>
-                    </div>
-                </div>
-            </article>
-
-            <article class="cart__card">
-                <div class="cart__box">
-                    {# PFAD KORRIGIERT #}
-                    <img src="{% static 'home/assets_shop/img/cart-2.png' %}" alt="" class="cart__img">
-                </div>
-
-                <div class="cart__details">
-                    <h3 class="cart__title">Cardigan Hoodie</h3>
-                    <span class="cart__price">$16</span>
-
-                    <div class="cart__amount">
-                        <div class="cart__amount-content">
-                            <span class="cart__amount-box">
-                                <i class="bx bx-minus"></i>
-                            </span>
-
-                            <span class="cart__amount-number">1</span>
-
-                            <span class="cart__amount-box">
-                                <i class="bx bx-plus"></i>
-                            </span>
-                        </div>
-
-                        <i class="bx bx-trash-alt cart__amount-trash"></i>
-                    </div>
-                </div>
-            </article>
-
-            <article class="cart__card">
-                <div class="cart__box">
-                    {# PFAD KORRIGIERT #}
-                    <img src="{% static 'home/assets_shop/img/cart-3.png' %}" alt="" class="cart__img">
-                </div>
-
-                <div class="cart__details">
-                    <h3 class="cart__title">Cartoon</h3>
-                    <span class="cart__price">$10</span>
-
-                    <div class="cart__amount">
-                        <div class="cart__amount-content">
-                            <span class="cart__amount-box">
-                                <i class="bx bx-minus"></i>
-                            </span>
-
-                            <span class="cart__amount-number">1</span>
-
-                            <span class="cart__amount-box">
-                                <i class="bx bx-plus"></i>
-                            </span>
-                        </div>
-
-                        <i class="bx bx-trash-alt cart__amount-trash"></i>
-                    </div>
-                </div>
-            </article>
+    <i class="bx bx-x cart__close" id="cart-close"></i>
+    <h2 class="cart__title-center">My Cart</h2>
+    <div class="cart__container">
         </div>
-
-        <div class="cart__prices">
-            <span class="cart__prices-item">3 item</span>
-            <span class="cart__prices-total">$38</span>
-        </div>
+    <div class="cart__prices">
+        <span class="cart__prices-item">0 item</span>
+        <span class="cart__prices-total">0.00 €</span>
     </div>
+</div>
 
-    <main class="main">
-        <section class="details section container">
-            <h2 class="breadcrumb__title">Details Page</h2>
-            
-            <h3 class="breadcrumb__subtitle"><a href="{% pageurl page.get_parent %}">Shop</a> > <span>{{ page.title }}</span></h3>
+<main class="main">
+    <section class="details section container">
+        <h2 class="breadcrumb__title">Details Page</h2>
+        <h3 class="breadcrumb__subtitle"><a href="{% pageurl page.get_parent %}">Shop</a> > <span>{{ page.title }}</span></h3>
 
-            <div class="details__container grid">
-                <div class="product__images grid">
+        <div class="details__container grid">
+            <div class="product__images grid">
+                {% if page.product_image %}
+                    <div class="product__img">
+                        {% image page.product_image height-1000 alt=page.title %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="product__info">
+                {% if page.orientation %}
+                    <p class="details__subtitle">{{ page.orientation | title }}</p>
+                {% endif %}
+                
+                <h3 class="details__title">{{ page.title }}</h3>
+
+                <div class="details__prices">
+                    <span class="details__price" id="product-price">--.-- €</span>
                     
-                    {% if page.product_image %}
-                        <div class="product__img">
-                            {% image page.product_image height-1000 alt=page.title %}
-                        </div>
-                    {% endif %}
+                    <span id="free-shipping-text" style="display: none; color: #e74c3c; font-size: var(--small-font-size); font-weight: var(--font-medium); margin-left: 1rem; background: rgba(231, 76, 60, 0.1); padding: 0.25rem 0.5rem; border-radius: 0.25rem;">
+                        Free Shipping
+                    </span>
                 </div>
 
-                <div class="product__info">
-                    {% if page.orientation %}
-                        <p class="details__subtitle">{{ page.orientation | title }}</p>
-                    {% endif %}
+                <div class="details__description" style="margin-top: var(--mb-2);">
+                    <p style="margin-bottom: 1rem; font-size: var(--small-font-size); color: var(--text-color);">
+                        Produced on the finest photo paper, each print captures every detail with stunning clarity. 
+                        Choose between A2 (42.0 x 59.4 cm) and A3 (29.7 x 42.0 cm) formats, available with or 
+                        without a high-quality frame to perfectly match your space.
+                    </p>
                     
-                    <h3 class="details__title">{{ page.title }}</h3>
-
-                    <div class="details__prices">
-                        {# This price is now set by JavaScript #}
-                        <span class="details__price" id="product-price">--.-- €</span>
+                    <div class="simple-description">
+                        {{ page.description_text | linebreaks }}
                     </div>
-
-
-                    <div class="details__description" style="margin-top: var(--mb-2);">
-                        <div class="simple-description">
-                            {{ page.description_text | linebreaks }}
-                        </div>
-                    </div>
-
+                </div>
 
                 <form action="{% url 'add_to_cart' product_id=page.id %}" method="POST" id="add-to-cart-form">
                     {% csrf_token %}
                     
                     {% with all_variants as variants %}
                         {% if variants %}
+                            
                             <div class="option-toggle" role="group" aria-label="Größe" style="margin-bottom: 1rem;">
-
                                 {% for variant in variants %}
                                 <label class="opt {% if forloop.first %}is-active{% endif %}">
                                     <input type="radio" 
-                                        name="size_variant" 
-                                        id="size_{{ variant.id }}" 
-                                        value="{{ variant.id }}" 
-                                        {% if forloop.first %}checked{% endif %}>
-                                    <span>{{ variant.size_name }}</span>
+                                           name="size_variant" 
+                                           id="size_{{ variant.id }}" 
+                                           value="{{ variant.id }}" 
+                                           {% if forloop.first %}checked{% endif %}>
+                                   <span>{{ variant.size_name }}</span>
+
+                                    {% if "A2" in variant.size_name %}
+                                        <div class="shipping-badge">
+                                            Free Shipping
+                                        </div>
+                                    {% endif %}
                                 </label>
                                 {% endfor %}
-
                             </div>
                             
-                            {% include "home/components/option_toggle.html" with name="add_frame" id_off="frame_no" id_on="frame_yes" label_off="No Frame" label_on="With Frame" value=False %}
+                            {% include "home/components/option_toggle.html" with name="add_frame" id_off="frame_no" id_on="frame_yes" label_off="No Frame" label_on="With Frame" value=False with_badge=True %}
                         
                         {% else %}
                             <p>Dieses Produkt ist derzeit nicht verfügbar.</p>
@@ -174,17 +171,15 @@
                     <button type="submit" class="button" id="add-to-cart-btn" style="width: 100%; margin-top: var(--mb-1-5);">Add To Cart</button>
                 </form>
 
-                    </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <section class="related__products section">
+    <section class="related__products section">
         <h2 class="section__title">Related Products</h2>
-
         <div class="new__container container">
             <div class="swiper new-swiper">
                 <div class="swiper-wrapper">
-                    
                     {% for product in related_products %}
                     <div class="shop__content swiper-slide">
                         <a href="{% pageurl product %}" class="related-product__main-link">
@@ -201,271 +196,154 @@
                         {% endif %}
 
                         <div class="shop__prices">
-                        
-                        {% with all_variants|first as first_variant %}
-                            {% if first_variant %}
-                                <span class="shop__price">From {{ first_variant.base_price }} €</span>
-                            {% endif %}
-                        {% endwith %}
+                            {% with all_variants|first as first_variant %}
+                                {% if first_variant %}
+                                    <span class="shop__price">From {{ first_variant.base_price }} €</span>
+                                {% endif %}
+                            {% endwith %}
                         </div>
-
-                        <a href="{% pageurl product %}" class="button shop__button">
-                            <i class="bx bx-cart-alt shop__icon"></i>
-                        </a>
                     </div>
                     {% endfor %}
-                    
                 </div>
             </div>
         </div>
     </section>
 </main>
-    <footer class="footer section">
-        <div class="footer__container container grid">
-            
-            <div class="footer__content">
-                <a href="#" class="footer__logo">
-                     <img src="{% static 'home/assets/images/logo_cumulophib.png' %}" alt="Logo" style="height: 2.5em; vertical-align: middle; margin-right: 0.5em;">
-                </a>
-                <p class="footer__description"> Danke! </p>
-                <div class="footer__social">
-                    <a href="https://www.instagram.com/cumulophib/" class="footer__social-link"><i class="bx bxl-instagram-alt"></i></a>
-                </div>
+
+<footer class="footer section">
+    <div class="footer__container container grid">
+        <div class="footer__content">
+            <a href="#" class="footer__logo">
+                    <img src="{% static 'home/assets/images/logo_cumulophib.png' %}" alt="Logo" style="height: 2.5em; vertical-align: middle; margin-right: 0.5em;">
+            </a>
+            <p class="footer__description"> Danke! </p>
+            <div class="footer__social">
+                <a href="https://www.instagram.com/cumulophib/" class="footer__social-link"><i class="bx bxl-instagram-alt"></i></a>
             </div>
-
-            <div class="footer__content">
-                <h3 class="footer__title">About</h3>
-                <ul class="footer__links">
-                    {% if about_page %}
-                        <li><a href="{% pageurl about_page %}" class="footer__link">About Us</a></li>
-                    {% endif %}
-                    <li><a href="#" class="footer__link">Customer Support</a></li>
-                    <li><a href="#" class="footer__link">Support Center</a></li>
-                </ul>
-            </div>
-
-            <div class="footer__content">
-                <h3 class="footer__title">Our Services</h3>
-                <ul class="footer__links">
-                    {% if index_shop_page %}
-                        <li><a href="{% pageurl index_shop_page %}" class="footer__link">Shop</a></li>
-                    {% endif %}
-                    <li><a href="#" class="footer__link">Discounts</a></li>
-                    <li><a href="#" class="footer__link">Shipping mode</a></li>
-                </ul>
-            </div>
-
-            <div class="footer__content">
-                <h3 class="footer__title">Our Company</h3>
-                <ul class="footer__links">
-                    {% if registration_page %}
-                        <li><a href="{% pageurl registration_page %}" class="footer__link">Register</a></li>
-                    {% endif %}
-                    {% if contact_page %}
-                        <li><a href="{% pageurl contact_page %}" class="footer__link">Contact Us</a></li>
-                    {% endif %}
-                    {% if about_page %}
-                        <li><a href="{% pageurl about_page %}" class="footer__link">About Us</a></li>
-                    {% endif %}
-                </ul>
-            </div>
-        </div>
-
-        <span class="footer__copy">&#169; Crypticalcoder. All rights reserved</span>
-    </footer>
-
-    <div class="lightbox">
-        <div class="lightbox__content">
-            <div class="lightbox__close">&times;</div>
-            {# PFAD KORRIGIERT #}
-            <img src="{% static 'home/assets_shop/img/details-2.png' %}" alt="" class="lightbox__img">
-            <div class="lightbox__caption">
-                <div class="caption__text">cumulophib</div>
-                <div class="caption__counter"></div>
-            </div>
-        </div>
-
-        <div class="lightbox__controls">
-            <div class="prev__item" onclick="prevItem()"><i class="bx bx-chevron-left"></i></div>
-            <div class="next__item" onclick="nextItem()"><i class="bx bx-chevron-right"></i></div>
         </div>
     </div>
+    <span class="footer__copy">&#169; Crypticalcoder. All rights reserved</span>
+</footer>
 
-    <a href="#" class="scrollup" id="scroll-up">
-        <i class="bx bx-up-arrow-alt scrollup__icon"></i>
-    </a>
+<div class="lightbox">
+    <div class="lightbox__content">
+        <div class="lightbox__close">&times;</div>
+        <img src="" alt="" class="lightbox__img">
+        <div class="lightbox__caption">
+            <div class="caption__text">cumulophib</div>
+            <div class="caption__counter"></div>
+        </div>
+    </div>
+    <div class="lightbox__controls">
+        <div class="prev__item" onclick="prevItem()"><i class="bx bx-chevron-left"></i></div>
+        <div class="next__item" onclick="nextItem()"><i class="bx bx-chevron-right"></i></div>
+    </div>
+</div>
 
-    <script>
-        const productItems = document.querySelectorAll(".product__img"),
-              totalProductItems = productItems.length,
-              lightbox = document.querySelector(".lightbox"),
-              lightboxImg = lightbox.querySelector(".lightbox__img"),
-              lightboxClose = lightbox.querySelector(".lightbox__close"),
-              lightboxCounter = lightbox.querySelector(".caption__counter");
-        let itemIndex = 0;
+<a href="#" class="scrollup" id="scroll-up"><i class="bx bx-up-arrow-alt scrollup__icon"></i></a>
 
-        for(let i=0; i<totalProductItems; i++) {
-            productItems[i].addEventListener("click", function() {
-                itemIndex=i;
-                changeItem();
-                toggleLightbox();
-            })
-        }
+<script src="{% static 'home/assets_shop/js/swiper-bundle.min.js' %}"></script>
+<script src="{% static 'home/assets_shop/js/main.js' %}"></script>
 
-        function nextItem() {
-            if(itemIndex === totalProductItems-1) {
-                itemIndex=0;
-            }
-
-            else{
-                itemIndex++
-            }
-            changeItem()
-        }
-
-        function prevItem() {
-            if(itemIndex === 0) {
-                itemIndex=totalProductItems-1;
-            }
-
-            else{
-                itemIndex--
-            }
-            changeItem()
-        }
-
-        function toggleLightbox() {
-            lightbox.classList.toggle("open");
-        }
-
-        function changeItem() {
-            // Dieses Skript sucht nach dem 'img'-Tag innerhalb des angeklickten '.product__img'
-            let imgTag = productItems[itemIndex].querySelector("img");
-            if (imgTag) {
-                let imgSrc = imgTag.getAttribute("src");
-                lightboxImg.src = imgSrc;
-                lightboxCounter.innerHTML = (itemIndex + 1) + " of " + totalProductItems;
-            }
-        }
-
-        // close lightbox (event-Variable hinzugefügt)
-        lightbox.addEventListener("click", function(event) {
-            if(event.target === lightboxClose || event.target === lightbox) {
-                toggleLightbox()
-            }
-        })
-    </script>
-
-    {# PFAD KORRIGIERT #}
-    <script src="{% static 'home/assets_shop/js/swiper-bundle.min.js' %}"></script>
-
-    {# PFAD KORRIGIERT #}
-    <script src="{% static 'home/assets_shop/js/main.js' %}"></script>
-
-{# HIER ENDET DER 'content' BLOCK, DER IN 'base.html' EINGEFÜGT WIRD #}
 {% endblock %}
 
 {% block extra_js %}
-    {{ block.super }} {# Inherits scripts from base.html #}
+    {{ block.super }}
 
     <script src="{% static 'home/assets_shop/js/swiper-bundle.min.js' %}?v=1.0.9"></script>
     <script src="{% static 'home/assets_shop/js/main.js' %}?v=1.0.9"></script>
 
     <script>
+    (function() {
+        const toggles = document.querySelectorAll('.option-toggle');
+        toggles.forEach(toggle => {
+            const inputs = toggle.querySelectorAll('input[type="radio"]');
+            inputs.forEach(input => {
+                input.addEventListener('change', function() {
+                    // Remove 'is-active' from all labels in this group
+                    const labels = toggle.querySelectorAll('.opt');
+                    labels.forEach(label => label.classList.remove('is-active'));
+                    // Add 'is-active' to the clicked one
+                    if (this.checked) {
+                        this.parentElement.classList.add('is-active');
+                    }
+                });
+            });
+        });
+    })();
+    </script>
+
+    <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // This script runs on page load and checks the URL
-        // to re-select any options from the previous page load.
         try {
             const urlParams = new URLSearchParams(window.location.search);
             const sizeId = urlParams.get('size');
-            const frame = urlParams.get('frame'); // "true" or "false"
+            const frame = urlParams.get('frame');
 
             if (sizeId) {
                 const sizeInput = document.querySelector('input[name="size_variant"][value="' + sizeId + '"]');
                 if (sizeInput) {
                     sizeInput.checked = true;
-                    // Manually update the visual style
-                    document.querySelectorAll('.option-toggle[aria-label="Größe"] .opt').forEach(label => label.classList.remove('is-active'));
-                    sizeInput.parentElement.classList.add('is-active');
+                    sizeInput.dispatchEvent(new Event('change')); 
                 }
             }
-            
             if (frame) {
                 const frameInput = document.querySelector('input[name="add_frame"][value="' + frame + '"]');
                 if (frameInput) {
                     frameInput.checked = true;
-                    // Manually update the visual style
-                    document.querySelectorAll('.option-toggle[aria-label="Option state"] .opt').forEach(label => label.classList.remove('is-active'));
-                    frameInput.parentElement.classList.add('is-active');
+                    frameInput.dispatchEvent(new Event('change')); 
                 }
             }
-        } catch (e) {
-            console.error("Error setting toggles from URL:", e);
-        }
+        } catch (e) { console.error(e); }
     });
     </script>
     
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        
-        // 1. Create a "map" of all prices from your new Wagtail model
-            const priceData = {
-            {% for variant in all_variants %}
-                '{{ variant.id }}': {   // <-- variant.id instead of variant.size_price.id
-                    'base': {{ variant.base_price | floatformat:2 }}, 
-                    'frame_addon': {{ variant.frame_addon_price | floatformat:2 }}
-                }{% if not forloop.last %},{% endif %}
-            {% endfor %}
-            };
+        const priceData = {
+        {% for variant in all_variants %}
+            '{{ variant.id }}': {
+                'base': {{ variant.base_price | floatformat:2 }}, 
+                'frame_addon': {{ variant.frame_addon_price | floatformat:2 }},
+                'name': "{{ variant.size_name|escapejs }}"
+            }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+        };
 
         const priceDisplay = document.getElementById('product-price');
-        // Find ALL radio buttons for size and frame
+        const shippingText = document.getElementById('free-shipping-text');
         const sizeRadios = document.querySelectorAll('input[name="size_variant"]');
         const frameRadios = document.querySelectorAll('input[name="add_frame"]');
 
         function updatePrice() {
             try {
-                // 2. Find the *currently selected* options
                 const selectedSizeId = document.querySelector('input[name="size_variant"]:checked').value;
-                const selectedFrame = document.querySelector('input[name="add_frame"]:checked').value; // "true" or "false"
+                const selectedFrame = document.querySelector('input[name="add_frame"]:checked').value;
 
-                // 3. Get the prices from our map
-                const prices = priceData[selectedSizeId];
-                if (!prices) {
-                    priceDisplay.textContent = 'Error';
-                    return;
-                }
+                const variantData = priceData[selectedSizeId];
+                if (!variantData) return;
 
-                // 4. Calculate the final price
-                let finalPrice = prices.base;
+                let finalPrice = variantData.base;
                 if (selectedFrame === 'true') {
-                    finalPrice += prices.frame_addon;
+                    finalPrice += variantData.frame_addon;
                 }
-
-                // 5. Update the page
                 priceDisplay.textContent = finalPrice.toFixed(2) + ' €';
+
+                // Logic to show "Free Shipping" TEXT next to price
+                const isA2 = variantData.name.toUpperCase().includes("A2");
+                const isFramed = (selectedFrame === 'true');
+
+                if (isA2 || isFramed) {
+                    shippingText.style.display = 'inline-block';
+                } else {
+                    shippingText.style.display = 'none';
+                }
             
-            } catch (e) {
-                // This might fail if no priceData exists, which is ok
-                priceDisplay.textContent = 'N/A';
-                console.log("Could not update price:", e.message);
-            }
+            } catch (e) { console.log("Update error:", e.message); }
         }
 
-        // 6. Add event listeners
-        // When *any* size radio changes, run updatePrice
-        sizeRadios.forEach(radio => {
-            radio.addEventListener('change', updatePrice);
-        });
-        
-        // When *any* frame radio changes, run updatePrice
-        frameRadios.forEach(radio => {
-            radio.addEventListener('change', updatePrice);
-        });
-
-        // 7. Run once on page load to set the initial price
-        // This will use the default 'checked' values (or the ones
-        // set by the URL param script above).
+        sizeRadios.forEach(r => r.addEventListener('change', updatePrice));
+        frameRadios.forEach(r => r.addEventListener('change', updatePrice));
         updatePrice();
     });
     </script>
@@ -488,22 +366,14 @@
         }
 
         function nextItem() {
-            if(itemIndex === totalProductItems-1) {
-                itemIndex=0;
-            }
-            else{
-                itemIndex++
-            }
+            if(itemIndex === totalProductItems-1) itemIndex=0;
+            else itemIndex++;
             changeItem()
         }
 
         function prevItem() {
-            if(itemIndex === 0) {
-                itemIndex=totalProductItems-1;
-            }
-            else{
-                itemIndex--
-            }
+            if(itemIndex === 0) itemIndex=totalProductItems-1;
+            else itemIndex--;
             changeItem()
         }
 
@@ -520,7 +390,6 @@
             }
         }
 
-        // close lightbox
         lightbox.addEventListener("click", function(event) {
             if(event.target === lightboxClose || event.target === lightbox) {
                 toggleLightbox()

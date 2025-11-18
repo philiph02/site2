@@ -164,28 +164,34 @@
 <div class="cart" id="cart">
             <i class="bx bx-x cart__close" id="cart-close"></i>
             <h2 class="cart__title-center">My Cart</h2>
-            <div class="cart__container">
-                
+         <div class="cart__container">
                 {% for item in cart_items %}
                     <article class="cart__card">
+                        
                         <div class="cart__box">
                             {% if item.product.product_image %}
-                                {% image item.product.product_image fill-100x100 class="cart__img" alt=item.product.title %}
+                                {% image item.product.product_image width-200 class="cart__img" alt=item.product.title %}
                             {% endif %}
                         </div>
+
                         <div class="cart__details">
-                            <h3 class="cart__title">{{ item.product.title }}</h3>
                             
-                            <span class="cart__options" style="font-size: var(--small-font-size); color: var(--text-color-light);">
+                            <h3 class="cart__title" style="margin-bottom: 0.1rem;">{{ item.product.title }}</h3>
+                            
+                            <span class="cart__options" style="display: block; font-size: var(--smaller-font-size); color: var(--text-color-light); margin-bottom: 0.25rem;">
                                 {{ item.size_name }}{% if item.framed %}, With Frame{% endif %}
                             </span>
                             
-                            <span class="cart__price">{{ item.price_per_item }} € (x{{ item.quantity }})</span>
-                            <span class="cart__price" style="font-weight: var(--font-semi-bold);">{{ item.item_total }} €</span>
+                            <div style="display: flex; align-items: center; gap: 0.8rem;">
+                                <span class="cart__price" style="margin-bottom: 0;">
+                                    {{ item.price_per_item }} € (x{{ item.quantity }})
+                                </span>
 
-                            <a href="{% url 'remove_one_from_cart' product_id=item.cart_key %}" class="cart__amount-trash-link" title="Remove one">
-                                <i class="bx bx-trash-alt cart__amount-trash"></i>
-                            </a>
+                                <a href="{% url 'remove_one_from_cart' product_id=item.cart_key %}" style="font-size: 1.2rem; color: var(--first-color); cursor: pointer; display: flex; align-items: center;" title="Remove one">
+                                    <i class="bx bx-trash-alt"></i>
+                                </a>
+                            </div>
+
                         </div>
                     </article>
                 {% empty %}

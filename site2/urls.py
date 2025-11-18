@@ -25,13 +25,14 @@ urlpatterns = [
 
     # Checkout URLs
     path("checkout/", home_views.checkout_page, name="checkout"),
-    path("payment/", home_views.payment_page, name="payment"),
     path("checkout/success/", home_views.checkout_success, name="checkout_success"),
     path("checkout/done/", home_views.checkout_done_page, name="checkout_done"),
 
     # NEW Authentication URLs
     path("login/", home_views.login_view, name="login_view"),
     path("logout/", home_views.logout_view, name="logout_view"),
+
+    path("api/calculate-shipping/", home_views.calculate_shipping_cost, name="calculate_shipping_cost"),
 ]
 
 

@@ -8,10 +8,15 @@
   <label class="opt {% if value %}is-active{% endif %}">
     <input type="radio" name="{{ name }}" id="{{ id_on }}" value="true" {% if value %}checked{% endif %}>
     <span>{{ label_on|default:"With Frame" }}</span>
+    
+    {% if with_badge %}
+      <div class="shipping-badge">
+          Free Shipping
+      </div>
+    {% endif %}
   </label>
 
 </div>
-
 <style>
 /* Dieses CSS ist komponentenspezifisch und bleibt in dieser Datei.
   Ich habe die Farben an dein Seitenthema angepasst.

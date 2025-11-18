@@ -14,10 +14,7 @@ from wagtail.admin.panels import FieldPanel, MultiFieldPanel, InlinePanel, Field
 from modelcluster.models import ParentalKey # <-- ADDED PARENTALKEY
 
 
-# ======================================================================
-# NEUES SNIPPET FÜR GLOBALE PREISE
-# (This model is unchanged and works perfectly for your new feature)
-# ======================================================================
+
 @register_snippet
 class PrintSizePrice(models.Model):
     size_name = models.CharField(
@@ -60,48 +57,114 @@ class HomePage(Page):
 class PhotographyPage(Page):
     template = "home/photography.html"
 
+class FeaturedProduct(Orderable):
+    """
+    This model controls all the custom content for a
+    single slide in the home page slider.
+    """
+    page = ParentalKey(
+        'home.IndexShopPage', 
+        on_delete=models.CASCADE, 
+        related_name='featured_products'
+    )
+    
+    # --- Link ---
+    product_to_link = models.ForeignKey(
+        'home.ProductPage',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+',
+        verbose_name="Product to Link (for 'Buy Now')"
+    )
+
+    # --- Image Group (for the main image) ---
+    slider_image = models.ForeignKey(
+        "wagtailimages.Image",
+        null=True,
+        blank=False,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        help_text="The main image for this slide."
+    )
+    # --- Image Group (for the small caption) ---
+    image_caption_title = models.CharField(max_length=100, blank=True, help_text="e.g., '25\" exposure'")
+    image_caption_subtitle = models.CharField(max_length=100, blank=True, help_text="e.g., 'Namibia'")
+
+    # --- Text Group ---
+    slider_subtitle = models.CharField(max_length=255, blank=True, help_text="e.g., '#1 TRENDING ITEM'")
+    
+    slider_title = RichTextField(
+        features=['bold', 'italic', 'br'], # 'br' allows line breaks
+        help_text="The main title, e.g., 'CELESTIAL <br> RUNWAY'"
+    )
+    
+    slider_description = models.TextField(blank=True, help_text="The main paragraph of text.")
+
+    panels = [
+        FieldPanel('product_to_link'),
+        MultiFieldPanel([
+            FieldPanel('slider_image'),
+            FieldPanel('image_caption_title'),
+            FieldPanel('image_caption_subtitle'),
+        ], heading="Slide Image"),
+        MultiFieldPanel([
+            FieldPanel('slider_subtitle'),
+            FieldPanel('slider_title'),
+            FieldPanel('slider_description'),
+        ], heading="Slide Text Content"),
+    ]
+
 # --- 3. "Shop" Hauptseite ---
 class IndexShopPage(Page):
-        template = "home/index_shop.html"
+    template = "home/index_shop.html"
 
-        def get_context(self, request, *args, **kwargs):
-            context = super().get_context(request, *args, **kwargs)
-            all_products = ProductPage.objects.live().specific()
-            
-            # --- THIS IS THE MISSING GRID LOGIC ---
-            horizontal = [p for p in all_products if p.orientation == 'horizontal'][:7]
-            vertical   = [p for p in all_products if p.orientation == 'vertical'][:7]
-            squared    = [p for p in all_products if p.orientation == 'squared'][:7]
+    # --- REMOVE these fields ---
+    # slider_product_1 = ...
+    # slider_product_2 = ...
+    # slider_product_3 = ...
 
-            def pad(lst, size):
-                return lst + [None] * (size - len(lst))
+    # --- REPLACE 'content_panels' with this ---
+    content_panels = Page.content_panels + [
+        MultiFieldPanel([
+            InlinePanel(
+                'featured_products', 
+                label="Slider Slides"
+            )
+        ], heading="Slider Content")
+    ]
+    # --- END OF PANEL ---
 
-            horizontal = pad(horizontal, 7)
-            vertical = pad(vertical, 7)
-            squared = pad(squared, 7)
+    def get_context(self, request, *args, **kwargs):
+        context = super().get_context(request, *args, **kwargs)
+        all_products = ProductPage.objects.live().specific()
+        
+        # ... (Your existing grid logic is fine) ...
+        horizontal = [p for p in all_products if p.orientation == 'horizontal'][:7]
+        vertical   = [p for p in all_products if p.orientation == 'vertical'][:7]
+        squared    = [p for p in all_products if p.orientation == 'squared'][:7]
+        def pad(lst, size):
+            return lst + [None] * (size - len(lst))
+        horizontal = pad(horizontal, 7)
+        vertical = pad(vertical, 7)
+        squared = pad(squared, 7)
+        grid_products = horizontal + vertical + squared
+        context['grid_products'] = grid_products
 
-            grid_products = horizontal + vertical + squared
-            context['grid_products'] = grid_products
-            # --- END OF MISSING LOGIC ---
+        # ... (Your cheapest_price logic is fine) ...
+        cheapest_variant = PrintSizePrice.objects.all().order_by('base_price').first()
+        if cheapest_variant:
+            context['cheapest_price'] = cheapest_variant.base_price
+        else:
+            context['cheapest_price'] = 0
+        
+        context['registration_page'] = RegistrationPage.objects.live().first()
 
-            # --- THIS IS THE PRICE LOGIC YOU ADDED ---
-            cheapest_variant = PrintSizePrice.objects.all().order_by('base_price').first()
-            
-            if cheapest_variant:
-                context['cheapest_price'] = cheapest_variant.base_price
-            else:
-                context['cheapest_price'] = 0
-            # --- END OF PRICE LOGIC ---
-            
-            # Get the registration page
-            context['registration_page'] = RegistrationPage.objects.live().first()
+        # --- REPLACE the 'slider_product_1' lines with this ---
+        context['featured_slider_items'] = self.featured_products.all()
+        # --- END ADD ---
 
-            context['slider_product_1'] = self.slider_product_1
-            context['slider_product_2'] = self.slider_product_2
-            context['slider_product_3'] = self.slider_product_3
-                
-
-            return context
+        return context
 
 # --- Produkt-Detailseite ---
 ORIENTATION_CHOICES = [
@@ -232,6 +295,18 @@ class RegistrationPage(Page):
 # (Dieser Code von der Stripe-Integration bleibt unverändert)
 
 class Order(models.Model):
+
+    country = models.CharField(
+        max_length=100, 
+        default='Austria', # Changed default to Austria
+        choices=[
+            ('Austria', 'Austria'),
+            ('Germany', 'Germany'),
+            ('Switzerland', 'Switzerland'),
+            ('Europe', 'Rest of Europe (EU)'),
+            ('World', 'Rest of World')
+        ]
+    )
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     email = models.EmailField()

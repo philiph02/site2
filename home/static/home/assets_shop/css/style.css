@@ -1257,8 +1257,8 @@ input {
 }
 
 .cart__box {
-    background-color: var(--container-color);
-    padding: .75rem 1.25rem;
+    background-color: transparent; /* Removes the grey background */
+    padding: 0;                    /* Removes the spacing around the image */
     display: flex;
     align-items: center;
 }
@@ -1269,7 +1269,7 @@ input {
 
 .cart__title {
     font-size: var(--normal-font-size);
-    margin-bottom: var(--mb-0-5);
+   
 }
 
 .cart__price {
