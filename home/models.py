@@ -6,16 +6,17 @@ from django.contrib.auth.models import User     # <-- ADD USER
 
 from wagtail.search import index
 
-from wagtail.models import Page
+from wagtail.models import Page, Orderable # <-- ADDED ORDERABLE
 from wagtail.fields import RichTextField
 
 from wagtail.snippets.models import register_snippet # NEU
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel, InlinePanel, FieldRowPanel # Stelle sicher, dass FieldRowPanel importiert ist
+from modelcluster.models import ParentalKey # <-- ADDED PARENTALKEY
 
 
 # ======================================================================
 # NEUES SNIPPET FÜR GLOBALE PREISE
-# Du kannst diese Preise jetzt im Admin unter "Snippets" -> "Print Size Prices" verwalten
+# (This model is unchanged and works perfectly for your new feature)
 # ======================================================================
 @register_snippet
 class PrintSizePrice(models.Model):
@@ -52,7 +53,7 @@ class PrintSizePrice(models.Model):
 
 # --- 1. "About Me" Seite ---
 class HomePage(Page):
-    template = "home/index.html" # Your models.py had index.html
+    template = "home/index.html" 
     # This page is now "About Me"
 
 # --- 2. "Photography" Seite ---
@@ -61,30 +62,46 @@ class PhotographyPage(Page):
 
 # --- 3. "Shop" Hauptseite ---
 class IndexShopPage(Page):
-    template = "home/index_shop.html"
+        template = "home/index_shop.html"
 
-    def get_context(self, request, *args, **kwargs):
-        context = super().get_context(request, *args, **kwargs)
-        all_products = ProductPage.objects.live().specific()
-        
-        horizontal = [p for p in all_products if p.orientation == 'horizontal'][:7]
-        vertical   = [p for p in all_products if p.orientation == 'vertical'][:7]
-        squared    = [p for p in all_products if p.orientation == 'squared'][:7]
+        def get_context(self, request, *args, **kwargs):
+            context = super().get_context(request, *args, **kwargs)
+            all_products = ProductPage.objects.live().specific()
+            
+            # --- THIS IS THE MISSING GRID LOGIC ---
+            horizontal = [p for p in all_products if p.orientation == 'horizontal'][:7]
+            vertical   = [p for p in all_products if p.orientation == 'vertical'][:7]
+            squared    = [p for p in all_products if p.orientation == 'squared'][:7]
 
-        def pad(lst, size):
-            return lst + [None] * (size - len(lst))
+            def pad(lst, size):
+                return lst + [None] * (size - len(lst))
 
-        horizontal = pad(horizontal, 7)
-        vertical = pad(vertical, 7)
-        squared = pad(squared, 7)
+            horizontal = pad(horizontal, 7)
+            vertical = pad(vertical, 7)
+            squared = pad(squared, 7)
 
-        grid_products = horizontal + vertical + squared
-        context['grid_products'] = grid_products
-        
-        # Get the registration page
-        context['registration_page'] = RegistrationPage.objects.live().first()
+            grid_products = horizontal + vertical + squared
+            context['grid_products'] = grid_products
+            # --- END OF MISSING LOGIC ---
 
-        return context
+            # --- THIS IS THE PRICE LOGIC YOU ADDED ---
+            cheapest_variant = PrintSizePrice.objects.all().order_by('base_price').first()
+            
+            if cheapest_variant:
+                context['cheapest_price'] = cheapest_variant.base_price
+            else:
+                context['cheapest_price'] = 0
+            # --- END OF PRICE LOGIC ---
+            
+            # Get the registration page
+            context['registration_page'] = RegistrationPage.objects.live().first()
+
+            context['slider_product_1'] = self.slider_product_1
+            context['slider_product_2'] = self.slider_product_2
+            context['slider_product_3'] = self.slider_product_3
+                
+
+            return context
 
 # --- Produkt-Detailseite ---
 ORIENTATION_CHOICES = [
@@ -93,6 +110,7 @@ ORIENTATION_CHOICES = [
     ('squared', 'Squared'), 
     ('other', 'Other'),
 ]
+
 
 # ======================================================================
 # PRODUCTPAGE MODELL AKTUALISIERT
@@ -120,26 +138,17 @@ class ProductPage(Page):
         help_text="Einfache Textbeschreibung"
     )
     
-    # NEU: Verknüpfung zum Preis-Snippet
-    # Die alten Felder 'price' und 'frame_addon_price' werden entfernt.
-    print_size = models.ForeignKey(
-        'home.PrintSizePrice',
-        null=True,
-        blank=False,
-        on_delete=models.SET_NULL,
-        related_name='+',
-        verbose_name="Druckgröße und Preis",
-        help_text="Wähle die Größe, um den Preis automatisch festzulegen."
-    )
+    # ENTFERNT: Das 'print_size' ForeignKey-Feld ist weg.
+    # Stattdessen verwenden wir das InlinePanel (siehe unten).
 
     # --- Wagtail Admin Panels ---
     content_panels = Page.content_panels + [
         MultiFieldPanel([
             FieldPanel("product_image"),
             FieldPanel("orientation"),
-            FieldPanel("print_size"), # NEUES PANEL (ersetzt die alten Preis-Panels)
         ], heading="Produkt-Details"),
         FieldPanel("description_text"),
+
     ]
 
     # --- Search Index ---
@@ -149,27 +158,11 @@ class ProductPage(Page):
     ]
 
     # ======================================================================
-    # NEUE @property METHODEN
-    # Diese geben die Preise aus dem Snippet an das Template weiter.
-    # Sie heißen 'price' und 'frame_addon_price', damit deine 
-    # alten Templates (shop, details) automatisch weiter funktionieren.
+    # ENTFERNT: Die @property Methoden 'price' und 'frame_addon_price'
+    # sind weg. Die Logik ist jetzt im Template (details.html) und
+    # in der add_to_cart-View, da sie von der *Auswahl* des Benutzers abhängt.
     # ======================================================================
     
-    @property
-    def price(self):
-        """ Gibt den Grundpreis aus dem verknüpften Snippet zurück. """
-        if self.print_size:
-            return self.print_size.base_price
-        return 0  # Fallback
-
-    @property
-    def frame_addon_price(self):
-        """ Gibt den Rahmen-Zusatzpreis aus dem Snippet zurück. """
-        if self.print_size:
-            return self.print_size.frame_addon_price
-        return 0  # Fallback
-    
-    # (Diese Eigenschaft ist von einer früheren Migration, stelle sicher, dass sie da ist)
     @property
     def related_products(self):
         return ProductPage.objects.live().public().exclude(pk=self.pk).order_by('-first_published_at')[:5]
@@ -190,6 +183,7 @@ class ProductPage(Page):
             .order_by('?')[:3]
         )
         context['related_products'] = related_products
+        context['all_variants'] = PrintSizePrice.objects.all().order_by('base_price')
         return context
 
 # --- Registrierungsseite (JETZT MIT LOGIK) ---
@@ -265,16 +259,29 @@ class Order(models.Model):
         return f'Order {self.id}'
 
     def get_total_cost(self):
+        # This logic is now simpler, as price is stored per item
         return sum(item.get_cost() for item in self.items.all())
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
     product = models.ForeignKey(ProductPage, related_name='order_items', on_delete=models.CASCADE) 
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.DecimalField(max_digits=10, decimal_places=2) # This is the FINAL price paid
     quantity = models.PositiveIntegerField(default=1)
+    
+    # ======================================================================
+    # NEUE FELDER HINZUGEFÜGT
+    # This stores WHAT the user bought (e.g., "A2", "Framed")
+    # ======================================================================
+    size_name = models.CharField(max_length=100, blank=True, default='')
+    framed = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.id)
 
     def get_cost(self):
         return self.price * self.quantity
+
+    def get_description(self):
+        # Helper-Funktion für die Admin-Anzeige
+        frame_desc = " (With Frame)" if self.framed else " (No Frame)"
+        return f"{self.product.title} - {self.size_name}{frame_desc}"

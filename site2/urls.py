@@ -7,7 +7,7 @@ from wagtail import urls as wagtail_urls
 from wagtail.documents import urls as wagtaildocs_urls
 
 from search import views as search_views
-from home import views as home_views # This import is already here
+from home import views as home_views 
 
 urlpatterns = [
     path("django-admin/", admin.site.urls),
@@ -16,8 +16,12 @@ urlpatterns = [
     path("search/", search_views.search, name="search"),
     
     # Cart URLs
+    # 'add' still uses int because we add by the Product Page ID
     path("cart/add/<int:product_id>/", home_views.add_to_cart, name="add_to_cart"),
-    path("cart/remove_one/<int:product_id>/", home_views.remove_one_from_cart, name="remove_one_from_cart"),
+    
+    # CHANGE HERE: Changed <int:product_id> to <str:product_id>
+    # This allows keys like "16_2_False" to be passed correctly.
+    path("cart/remove_one/<str:product_id>/", home_views.remove_one_from_cart, name="remove_one_from_cart"),
 
     # Checkout URLs
     path("checkout/", home_views.checkout_page, name="checkout"),

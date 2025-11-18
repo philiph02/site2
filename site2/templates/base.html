@@ -161,10 +161,11 @@
         </div>
         {% endcomment %}
 
-        <div class="cart" id="cart">
+<div class="cart" id="cart">
             <i class="bx bx-x cart__close" id="cart-close"></i>
             <h2 class="cart__title-center">My Cart</h2>
             <div class="cart__container">
+                
                 {% for item in cart_items %}
                     <article class="cart__card">
                         <div class="cart__box">
@@ -174,9 +175,15 @@
                         </div>
                         <div class="cart__details">
                             <h3 class="cart__title">{{ item.product.title }}</h3>
-                            <span class="cart__price">{{ item.item_total }} €</span>
-                            <span class="cart__quantity">Items: {{ item.quantity }}</span>
-                            <a href="{% url 'remove_one_from_cart' product_id=item.product.id %}" class="cart__amount-trash-link" title="Remove one">
+                            
+                            <span class="cart__options" style="font-size: var(--small-font-size); color: var(--text-color-light);">
+                                {{ item.size_name }}{% if item.framed %}, With Frame{% endif %}
+                            </span>
+                            
+                            <span class="cart__price">{{ item.price_per_item }} € (x{{ item.quantity }})</span>
+                            <span class="cart__price" style="font-weight: var(--font-semi-bold);">{{ item.item_total }} €</span>
+
+                            <a href="{% url 'remove_one_from_cart' product_id=item.cart_key %}" class="cart__amount-trash-link" title="Remove one">
                                 <i class="bx bx-trash-alt cart__amount-trash"></i>
                             </a>
                         </div>

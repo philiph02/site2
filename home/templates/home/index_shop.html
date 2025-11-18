@@ -41,85 +41,49 @@
 
 
 <main class="main">
-    <section class="home container">
-        <div class="swiper home-swiper">
-            <div class="swiper-wrapper">
-                <section class="swiper-slide">
-                    <div class="home__content grid">
-                        <div class="home__group">
-                            <img src="{% static 'home/assets_shop/img/pics_jpg/web-7329.jpg' %}" alt="" class="home__img">
-                            <div class="home__indicator"></div>
-                            <div class="home__details-img">
-                                <h4 class="home__details-title">25" exposure</h4>
-                                <span class="home__details-subtitle">Namibia</span>
-                            </div>
-                        </div>
-                        <div class="home__data">
-                            <h3 class="home__subtitle">#1 TRENDING ITEM</h3>
-                            <h1 class="home__title">CELESTIAL  <br> RUNWAY <br> </h1>
-                            <p class="home__description">Beneath the Milky Way’s arc, a glider awaits its journey—where sand, sky, and starlight blur the edge of possibility.</p>
-                            <div class="home__buttons">
-                                <a href="#" class="button">Buy Now</a>
-                                <a href="#" class="button--link button--flex">View Details <i class="bx bx-right-arrow-alt button__icon"></i></a>
-                            </div>
+ 
+
+<section class="home container">
+    <div class="swiper home-swiper">
+        <div class="swiper-wrapper">
+        
+            <section class="swiper-slide">
+                <div class="home__content grid">
+                    <div class="home__data">
+                        <div class="home__buttons">
+                            <a href="{% if slider_product_1 %}{% pageurl slider_product_1 %}{% else %}#{% endif %}" class="button">Buy Now</a>
+                            <a href="{% if slider_product_1 %}{% pageurl slider_product_1 %}{% else %}#{% endif %}" class="button--link button--flex">View Details <i class="bx bx-right-arrow-alt button__icon"></i></a>
                         </div>
                     </div>
-                </section>
-                <section class="swiper-slide">
-                    <div class="home__content grid">
-                        <div class="home__group">
-                            <img src="{% static 'home/assets_shop/img/pics_jpg/web-5214.jpg' %}" alt="" class="home__img">
-                            <div class="home__indicator"></div>
-
-                            <div class="home__details-img">
-                                <h4 class="home__details-title">Rolls-Royce RB211</h4>
-                                <span class="home__details-subtitle">Frankfurt</span>
-                            </div>
-                        </div>
-
-                        <div class="home__data">
-                            <h3 class="home__subtitle">#2 ROAR</h3>
-                            <h1 class="home__title">ROLLS <br> ROYCE <br> </h1>
-                            <p class="home__description">Meet the iconic Rolls-Royce RB211 engine beneath the wing of a Boeing 757 at Frankfurt Airport. Precision engineering meets the poetry of flight, where every turbine blade tells a story of power, progress, and wanderlust.</p>
-
-                            <div class="home__buttons">
-                                <a href="#" class="button">Buy Now</a>
-                                <a href="#" class="button--link button--flex">View Details <i class="bx bx-right-arrow-alt button__icon"></i></a>
-                            </div>
+                </div>
+            </section>
+            
+            <section class="swiper-slide">
+                <div class="home__content grid">
+                    <div class="home__data">
+                        <div class="home__buttons">
+                            <a href="{% if slider_product_2 %}{% pageurl slider_product_2 %}{% else %}#{% endif %}" class="button">Buy Now</a>
+                            <a href="{% if slider_product_2 %}{% pageurl slider_product_2 %}{% else %}#{% endif %}" class="button--link button--flex">View Details <i class="bx bx-right-arrow-alt button__icon"></i></a>
                         </div>
                     </div>
-                </section>
-
-                <section class="swiper-slide">
-                    <div class="home__content grid">
-                        <div class="home__group">
-                            <img src="{% static 'home/assets_shop/img/pics_jpg/web-10.jpg' %}" alt="" class="home__img">
-                            <div class="home__indicator"></div>
-
-                            <div class="home__details-img">
-                                <h4 class="home__details-title">Wrong direction?</h4>
-                                <span class="home__details-subtitle">Meduno</span>
-                            </div>
-                        </div>
-
-                        <div class="home__data">
-                            <h3 class="home__subtitle">#3 Chasing the wind</h3>
-                            <h1 class="home__title">WRONG  <br> DIRECTION  <br> </h1>
-                            <p class="home__description">Evening in Meduno. With just 1.5 kg of fabric and lines, a paraglider climbs the ridge—steps lit by dusk, the journey shaped by a steady northern breeze. Upwards, toward the last light.
-But why is he running in the wrong direction?</p>
-
-                            <div class="home__buttons">
-                                <a href="#" class="button">Buy Now</a>
-                                <a href="#" class="button--link button--flex">View Details <i class="bx bx-right-arrow-alt button__icon"></i></a>
-                            </div>
+                </div>
+            </section>
+            
+            <section class="swiper-slide">
+                <div class="home__content grid">
+                    <div class="home__data">
+                        <div class="home__buttons">
+                            <a href="{% if slider_product_3 %}{% pageurl slider_product_3 %}{% else %}#{% endif %}" class="button">Buy Now</a>
+                            <a href="{% if slider_product_3 %}{% pageurl slider_product_3 %}{% else %}#{% endif %}" class="button--link button--flex">View Details <i class="bx bx-right-arrow-alt button__icon"></i></a>
                         </div>
                     </div>
-                </section>
-            </div>
+                </div>
+            </section>
+        </div>
 
         <div class="swiper-pagination home-pagination"></div>
     </div>
-    </section>
+</section>
 
     <section class="new section">
     <h2 class="section__title">Prints</h2>
@@ -136,9 +100,9 @@ But why is he running in the wrong direction?</p>
                                 {% endif %}
                                 <h3 class="new__title">{{ product.title }}</h3>
                                 <span class="new__subtitle">{{ product.orientation|title }}</span>
-                                <div class="new__prices">
-                                    <span class="new__price">{{ product.price }} €</span>
-                                </div>
+                                <div class="shop__prices">
+                                        <span class="shop__price"> From {{ cheapest_price }} €</span>
+                                    </div>
                                 <a href="{% pageurl product %}" class="card-link-overlay" style="position: absolute; inset: 0; z-index: 2; display: block;"></a>
                             </div>
 

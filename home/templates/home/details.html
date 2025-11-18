@@ -11,8 +11,6 @@
 {% endblock %}
 {% block content %}
 
-<!--=============== CART ===============-->
-
 <div class="cart" id="cart">
         <i class="bx bx-x cart__close" id="cart-close"></i>
 
@@ -110,40 +108,7 @@
         </div>
     </div>
 
-    <!--=============== LOGIN ===============-->
-<!-- <div class="login" id="login">
-        <i class="bx bx-x login__close" id="login-close"></i>
-
-        <h2 class="login__title-center">Login</h2>
-
-        <form action="" class="login__form grid">
-            <div class="login__content">
-                <label for="" class="login__label">Email</label>
-                <input type="email" class="login__input">
-            </div>
-
-            <div class="login__content">
-                <label for="" class="login__label">Password</label>
-                <input type="password" class="login__input">
-            </div>
-
-            <div>
-                <a href="#" class="button">Sign in</a>
-            </div>
-
-            {# --- KORRIGIERTER WAGTAIL LINK --- #}
-            {# Verwendet die Logik aus deiner index_shop.html #}
-            <div>
-            {% if registration_page %}
-                <p class="signup">Not a member? <a href="{% pageurl registration_page %}">Sign up now</a></p>
-            {% else %}
-                <p class="signup"><span>Sign up now</span></p>
-            {% endif %}
-            </div>
-        </form>
-    </div> -->
-    <!--=============== MAIN ===============-->
-<main class="main">
+    <main class="main">
         <section class="details section container">
             <h2 class="breadcrumb__title">Details Page</h2>
             
@@ -167,12 +132,12 @@
                     <h3 class="details__title">{{ page.title }}</h3>
 
                     <div class="details__prices">
-                        <span class="details__price" id="product-price">{{ page.price }} €</span>
+                        {# This price is now set by JavaScript #}
+                        <span class="details__price" id="product-price">--.-- €</span>
                     </div>
 
 
                     <div class="details__description" style="margin-top: var(--mb-2);">
-                        <p style="margin-bottom: var(--mb-0-75);">All prints come in A2 format (42.0 x 59.4 cm).</p>
                         <div class="simple-description">
                             {{ page.description_text | linebreaks }}
                         </div>
@@ -181,12 +146,31 @@
 
                 <form action="{% url 'add_to_cart' product_id=page.id %}" method="POST" id="add-to-cart-form">
                     {% csrf_token %}
-
-                    {% if page.frame_addon_price > 0 %}
-
-                        {% include "home/components/option_toggle.html" with name="add_frame" id_off="frame_no" id_on="frame_yes" label_off="Without Frame" label_on="With Frame" value=False %}
-                    {% endif %}
                     
+                    {% with all_variants as variants %}
+                        {% if variants %}
+                            <div class="option-toggle" role="group" aria-label="Größe" style="margin-bottom: 1rem;">
+
+                                {% for variant in variants %}
+                                <label class="opt {% if forloop.first %}is-active{% endif %}">
+                                    <input type="radio" 
+                                        name="size_variant" 
+                                        id="size_{{ variant.id }}" 
+                                        value="{{ variant.id }}" 
+                                        {% if forloop.first %}checked{% endif %}>
+                                    <span>{{ variant.size_name }}</span>
+                                </label>
+                                {% endfor %}
+
+                            </div>
+                            
+                            {% include "home/components/option_toggle.html" with name="add_frame" id_off="frame_no" id_on="frame_yes" label_off="No Frame" label_on="With Frame" value=False %}
+                        
+                        {% else %}
+                            <p>Dieses Produkt ist derzeit nicht verfügbar.</p>
+                        {% endif %}
+                    {% endwith %}
+
                     <button type="submit" class="button" id="add-to-cart-btn" style="width: 100%; margin-top: var(--mb-1-5);">Add To Cart</button>
                 </form>
 
@@ -217,9 +201,12 @@
                         {% endif %}
 
                         <div class="shop__prices">
-                            {% if product.price %}
-                                <span class="shop__price">{{ product.price }} €</span>
+                        
+                        {% with all_variants|first as first_variant %}
+                            {% if first_variant %}
+                                <span class="shop__price">From {{ first_variant.base_price }} €</span>
                             {% endif %}
+                        {% endwith %}
                         </div>
 
                         <a href="{% pageurl product %}" class="button shop__button">
@@ -233,8 +220,7 @@
         </div>
     </section>
 </main>
-    <!--=============== FOOTER ===============-->
-<footer class="footer section">
+    <footer class="footer section">
         <div class="footer__container container grid">
             
             <div class="footer__content">
@@ -288,7 +274,6 @@
         <span class="footer__copy">&#169; Crypticalcoder. All rights reserved</span>
     </footer>
 
-    <!--=============== LIGHTBOX ===============-->
     <div class="lightbox">
         <div class="lightbox__content">
             <div class="lightbox__close">&times;</div>
@@ -310,22 +295,6 @@
         <i class="bx bx-up-arrow-alt scrollup__icon"></i>
     </a>
 
-    <!-- <div class="style__switcher">
-        <div class="style__switcher-toggler s__icon">
-            <i class="bx bxs-cog bx-spin"></i>
-        </div>
-
-        <h4>Theme Colors</h4>
-
-        <div class="theme__colors js-theme-colors">
-            <button type="button"  data-js-theme-color="color-1" class="js-theme-color-item theme__button color-1"><i class="bx bx-check"></i></button>
-            <button type="button"  data-js-theme-color="color-2" class="js-theme-color-item theme__button color-2"><i class="bx bx-check"></i></button>
-            <button type="button"  data-js-theme-color="color-3" class="js-theme-color-item theme__button color-3"><i class="bx bx-check"></i></button>
-            <button type="button"  data-js-theme-color="color-4" class="js-theme-color-item theme__button color-4"><i class="bx bx-check"></i></button>
-            <button type="button"  data-js-theme-color="color-5" class="js-theme-color-item theme__button color-5"><i class="bx bx-check"></i></button>
-        </div>
-    </div> -->
-    
     <script>
         const productItems = document.querySelectorAll(".product__img"),
               totalProductItems = productItems.length,
@@ -404,40 +373,103 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const priceDisplay = document.getElementById('product-price');
-        
-        // Holt die Radio-Buttons aus deiner option_toggle.html Komponente
-        const radioNoFrame = document.getElementById('frame_no');
-        const radioYesFrame = document.getElementById('frame_yes');
+        // This script runs on page load and checks the URL
+        // to re-select any options from the previous page load.
+        try {
+            const urlParams = new URLSearchParams(window.location.search);
+            const sizeId = urlParams.get('size');
+            const frame = urlParams.get('frame'); // "true" or "false"
 
-        // Deine Preise werden jetzt dynamisch aus dem Wagtail-Modell geladen
-        const basePrice = parseFloat("{{ page.price }}"); 
-        const frameAddonPrice = parseFloat("{{ page.frame_addon_price }}"); 
-        const framedPrice = basePrice + frameAddonPrice; // Berechnet den Gesamtpreis
-
-        if (priceDisplay && radioNoFrame && radioYesFrame) {
+            if (sizeId) {
+                const sizeInput = document.querySelector('input[name="size_variant"][value="' + sizeId + '"]');
+                if (sizeInput) {
+                    sizeInput.checked = true;
+                    // Manually update the visual style
+                    document.querySelectorAll('.option-toggle[aria-label="Größe"] .opt').forEach(label => label.classList.remove('is-active'));
+                    sizeInput.parentElement.classList.add('is-active');
+                }
+            }
             
-            // Event Listener für "Without Frame"
-            radioNoFrame.addEventListener('change', function() {
-                if (this.checked) {
-                    priceDisplay.textContent = basePrice.toFixed(2) + ' €';
+            if (frame) {
+                const frameInput = document.querySelector('input[name="add_frame"][value="' + frame + '"]');
+                if (frameInput) {
+                    frameInput.checked = true;
+                    // Manually update the visual style
+                    document.querySelectorAll('.option-toggle[aria-label="Option state"] .opt').forEach(label => label.classList.remove('is-active'));
+                    frameInput.parentElement.classList.add('is-active');
                 }
-            });
-
-            // Event Listener für "With Frame"
-            radioYesFrame.addEventListener('change', function() {
-                if (this.checked) {
-                    // Preis auf den vollen Rahmenpreis setzen
-                    priceDisplay.textContent = framedPrice.toFixed(2) + ' €';
-                }
-            });
-        
-        } else if (priceDisplay) {
-             // Fallback, falls die Buttons nicht da sind (z.B. kein Rahmen-Addon)
-             priceDisplay.textContent = basePrice.toFixed(2) + ' €';
+            }
+        } catch (e) {
+            console.error("Error setting toggles from URL:", e);
         }
     });
     </script>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // 1. Create a "map" of all prices from your new Wagtail model
+            const priceData = {
+            {% for variant in all_variants %}
+                '{{ variant.id }}': {   // <-- variant.id instead of variant.size_price.id
+                    'base': {{ variant.base_price | floatformat:2 }}, 
+                    'frame_addon': {{ variant.frame_addon_price | floatformat:2 }}
+                }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+            };
+
+        const priceDisplay = document.getElementById('product-price');
+        // Find ALL radio buttons for size and frame
+        const sizeRadios = document.querySelectorAll('input[name="size_variant"]');
+        const frameRadios = document.querySelectorAll('input[name="add_frame"]');
+
+        function updatePrice() {
+            try {
+                // 2. Find the *currently selected* options
+                const selectedSizeId = document.querySelector('input[name="size_variant"]:checked').value;
+                const selectedFrame = document.querySelector('input[name="add_frame"]:checked').value; // "true" or "false"
+
+                // 3. Get the prices from our map
+                const prices = priceData[selectedSizeId];
+                if (!prices) {
+                    priceDisplay.textContent = 'Error';
+                    return;
+                }
+
+                // 4. Calculate the final price
+                let finalPrice = prices.base;
+                if (selectedFrame === 'true') {
+                    finalPrice += prices.frame_addon;
+                }
+
+                // 5. Update the page
+                priceDisplay.textContent = finalPrice.toFixed(2) + ' €';
+            
+            } catch (e) {
+                // This might fail if no priceData exists, which is ok
+                priceDisplay.textContent = 'N/A';
+                console.log("Could not update price:", e.message);
+            }
+        }
+
+        // 6. Add event listeners
+        // When *any* size radio changes, run updatePrice
+        sizeRadios.forEach(radio => {
+            radio.addEventListener('change', updatePrice);
+        });
+        
+        // When *any* frame radio changes, run updatePrice
+        frameRadios.forEach(radio => {
+            radio.addEventListener('change', updatePrice);
+        });
+
+        // 7. Run once on page load to set the initial price
+        // This will use the default 'checked' values (or the ones
+        // set by the URL param script above).
+        updatePrice();
+    });
+    </script>
+    
     <script>
         const productItems = document.querySelectorAll(".product__img"),
               totalProductItems = productItems.length,
