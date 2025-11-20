@@ -1,253 +1,158 @@
-from django.shortcuts import redirect, render, get_object_or_404
-from django.http import HttpResponseBadRequest, JsonResponse, QueryDict
+from django.shortcuts import redirect, render
+from django.http import HttpResponseBadRequest
 from django.conf import settings 
 from django.urls import reverse
-import stripe 
-from decimal import Decimal, InvalidOperation # <-- ADDED
-from urllib.parse import urlparse, urlunparse # <-- ADDED
-
-# <-- ADDED PrintSizePrice
-from .models import ProductPage, Order, OrderItem, IndexShopPage, PrintSizePrice 
-from .forms import OrderCreateForm 
-
-# NEW imports for login/logout
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
+from django.contrib.auth import login, logout
+from django.contrib.auth.forms import AuthenticationForm
+import stripe 
 
-# --- Cart Views (Corrected) ---
+from .models import ProductPage, Order, OrderItem, PrintSizePrice
+
+# --- Helper: Country Lists ---
+
+def get_eu_countries():
+    """Returns list of EU country codes (excluding Austria)."""
+    # FIXED: 'GR' is the correct Stripe code for Greece
+    return [
+        'BE', 'BG', 'CZ', 'DK', 'DE', 'EE', 'IE', 'GR', 'ES', 'FR', 'HR', 'IT', 
+        'CY', 'LV', 'LT', 'LU', 'HU', 'MT', 'NL', 'PL', 'PT', 'RO', 'SI', 
+        'SK', 'FI', 'SE'
+    ]
+
+def get_europe_non_eu():
+    """Returns Non-EU European countries (Switzerland, UK, Norway, etc.)"""
+    return [
+        'CH', 'GB', 'NO', 'IS', 'LI', 'AL', 'AD', 'BA', 'ME', 'MK', 'RS', 'TR'
+    ]
+
+def get_world_countries():
+    """Returns major international shipping destinations."""
+    return ['US', 'CA', 'AU', 'NZ', 'JP', 'SG', 'AE', 'QA', 'KR']
+
+# --- Cart Views ---
 
 def add_to_cart(request, product_id):
-    """
-    Adds a product to the session cart with specific size and frame options.
-    This view now expects a POST request.
-    """
-    if request.method != 'POST':
-        return HttpResponseBadRequest("This view only accepts POST requests.")
-
-    cart = request.session.get('cart', {})
-
-    # === NEUE LOGIK (FIX FÜR PROBLEM 1) ===
     try:
         product = ProductPage.objects.get(id=product_id)
-        
-        # Get data from the form
-        size_id = request.POST.get('size_variant')
-        add_frame_str = request.POST.get('add_frame', 'false')
-        add_frame = (add_frame_str == 'true')
-        quantity = int(request.POST.get('quantity', 1))
+    except ProductPage.DoesNotExist:
+        return HttpResponseBadRequest("Product not found")
 
-        if not size_id:
-            messages.error(request, "Please select a size.")
-            return redirect(request.META.get('HTTP_REFERER', '/'))
-
-        # Get the price snippet object
-        size_price_obj = PrintSizePrice.objects.get(id=size_id)
-
-    except (ProductPage.DoesNotExist, PrintSizePrice.DoesNotExist):
-        messages.error(request, "Product or size not found.")
-        return redirect(request.META.get('HTTP_REFERER', '/'))
-    except (ValueError, TypeError):
-        quantity = 1  
+    cart = request.session.get('cart', {})
+    quantity = 1
+    if request.method == 'POST':
+        try:
+            quantity = int(request.POST.get('quantity', 1))
+        except (ValueError, TypeError):
+            quantity = 1
+            
+    size_id = request.POST.get('size_variant')
+    add_frame_str = request.POST.get('add_frame', 'false')
+    add_frame = (add_frame_str == 'true')
     
-    # Create a unique key for this exact configuration
-    # e.g., "12_5_true" (ProductID 12, SizeID 5, Framed)
-    cart_key = f"{product_id}_{size_id}_{add_frame}"
+    size_name = "Standard"
+    price_to_add = product.price 
+    
+    if size_id:
+        try:
+            variant = PrintSizePrice.objects.get(id=size_id)
+            size_name = variant.size_name
+            price_to_add = variant.base_price
+            if add_frame:
+                price_to_add += variant.frame_addon_price
+        except PrintSizePrice.DoesNotExist:
+            pass
 
-    # Calculate the final price for *one* item
-    final_price = size_price_obj.base_price
-    if add_frame:
-        final_price += size_price_obj.frame_addon_price
-
+    cart_key = f"{product.id}_{size_id}_{add_frame}"
+    
     if cart_key in cart:
-        # Item already in cart, just increase quantity
         cart[cart_key]['quantity'] += quantity
     else:
-        # New item, add all details
         cart[cart_key] = {
             'product_id': product.id,
             'product_title': product.title,
-            'size_id': size_id,
-            'size_name': size_price_obj.size_name,
+            'size_name': size_name,
             'framed': add_frame,
             'quantity': quantity,
-            'price': str(final_price) # Store price at time of adding
+            'price': str(price_to_add)
         }
 
     request.session['cart'] = cart
     request.session.modified = True
-    messages.success(request, f"Added {product.title} to cart.")
-    
-    # === NEUE LOGIK (FIX FÜR PROBLEM 2) ===
-    # Redirect back to the same page, but add query parameters
-    # so the JavaScript can re-select the user's options.
-    
-    referer_url = request.META.get('HTTP_REFERER', '/')
-    
-    parsed_url = urlparse(referer_url)
-    query_dict = QueryDict(parsed_url.query, mutable=True)
-    query_dict['size'] = size_id
-    query_dict['frame'] = add_frame_str
-    
-    new_query_string = query_dict.urlencode()
-    new_url = urlunparse((
-        parsed_url.scheme, 
-        parsed_url.netloc, 
-        parsed_url.path, 
-        parsed_url.params, 
-        new_query_string, 
-        parsed_url.fragment
-    ))
-    
-    return redirect(new_url)
+    messages.success(request, f"Added {product.title} to cart")
+    return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
 def remove_one_from_cart(request, product_id):
-    """
-    Reduces the quantity of an item in the cart by 1.
-    NOTE: This now expects 'product_id' to be the 'cart_key'
-    This view may need updating depending on how you link to it.
-    For simplicity, this example assumes product_id is the cart_key.
-    """
     cart = request.session.get('cart', {})
-    cart_key = str(product_id) # Assuming product_id is the cart_key
-
-    if cart_key in cart:
-        cart[cart_key]['quantity'] -= 1
-        if cart[cart_key]['quantity'] <= 0:
-            del cart[cart_key]
-    
+    if product_id in cart:
+        del cart[product_id]
     request.session['cart'] = cart
     request.session.modified = True
-    
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
-# --- Checkout & Payment Views ---
+
+# --- Checkout View (Stripe Embedded) ---
 
 def checkout_page(request):
-    """
-    Handles the Address Form (Step 1 of checkout).
-    """
-    cart_session = request.session.get('cart', {})
-    if not cart_session:
-        messages.error(request, "Your cart is empty.")
-        shop_page = IndexShopPage.objects.live().first()
-        if shop_page:
-            return redirect(shop_page.url)
-        return redirect('/') 
-
-    if request.method == 'POST':
-        form = OrderCreateForm(request.POST)
-        
-        if form.is_valid():
-            # Save address data to session, don't create Order yet
-            request.session['order_data'] = form.cleaned_data
-            return redirect(reverse('payment')) 
-            
-    else:
-        # Pre-fill form if user is logged in
-        if request.user.is_authenticated:
-            initial_data = {
-                'first_name': request.user.first_name,
-                'last_name': request.user.last_name,
-                'email': request.user.email,
-            }
-            form = OrderCreateForm(initial=initial_data)
-        else:
-            form = OrderCreateForm()
-        
-    return render(request, 'home/checkout.html', {'form': form})
-
-# home/views.py
-
-# ... (Keep imports and top part: add_to_cart, remove_one_from_cart) ...
-
-# --- NEW: Helper for Country Codes ---
-def get_eu_country_codes():
-    return [
-        'BE', 'BG', 'CZ', 'DK', 'DE', 'EE', 'IE', 'EL', 'ES', 'FR', 'HR', 'IT', 
-        'CY', 'LV', 'LT', 'LU', 'HU', 'MT', 'NL', 'AT', 'PL', 'PT', 'RO', 'SI', 
-        'SK', 'FI', 'SE'
-    ]
-
-# --- REPLACES checkout_page AND payment_page ---
-def checkout_page(request):
-    """
-    Single-step Checkout using Stripe Embedded Checkout.
-    Calculates shipping rules and lets Stripe handle address/payment.
-    """
     cart_session = request.session.get('cart', {})
     if not cart_session:
         messages.error(request, "Your cart is empty.")
         return redirect('/')
 
-    # 1. Analyze Cart for Shipping Rules
-    product_total = 0
-    total_quantity = 0
-    has_a2 = False
-    has_frame = False
-    
+    # 1. Analyze Cart for Shipping Logic
+    has_heavy_item = False # True if A2 or Framed
     stripe_line_items = []
     
-    # Filter for valid product IDs
+    # Extract real IDs
     real_ids = [k.split('_')[0] for k in cart_session.keys()]
-    products = ProductPage.objects.filter(id__in=real_ids)
-    product_map = {str(p.id): p for p in products}
 
     for cart_key, item_data in cart_session.items():
         if isinstance(item_data, dict):
             qty = int(item_data['quantity'])
-            # We need a price in CENTS for Stripe
             price_float = float(item_data['price'])
             price_cents = int(price_float * 100)
             
             size_name = item_data.get('size_name', '')
             is_framed = item_data.get('framed', False)
             
-            if 'A2' in size_name.upper(): has_a2 = True
-            if is_framed: has_frame = True
+            # Logic: A2 or Framed triggers higher shipping
+            if 'A2' in str(size_name).upper() or is_framed: 
+                 has_heavy_item = True
             
-            # Create Line Item for Stripe
             stripe_line_items.append({
                 'price_data': {
                     'currency': 'eur',
                     'product_data': {
                         'name': f"{item_data['product_title']} ({size_name})",
                         'description': "Framed" if is_framed else "Print Only",
-                        # Optional: Add images here if you have absolute URLs
                     },
                     'unit_amount': price_cents,
                 },
                 'quantity': qty,
             })
-            
-            product_total += price_float * qty
-            total_quantity += qty
 
-    # 2. Define Shipping Rates based on your Rules
+    # 2. Calculate Prices (in Cents)
     
-    # --- Austria Rules ---
-    # Free if: >1 item OR A2 OR Framed. Else 4.90
-    austria_price = 490 # 4.90 in cents
-    if total_quantity > 1 or has_a2 or has_frame:
-        austria_price = 0
-        
-    # --- International Base Rules ---
-    # Base EU Rate
-    if has_a2:
-        eu_price = 1590 # 15.90
-    else:
-        eu_price = 1290 # 12.90
+    # Austria: 4.90 EUR (Free if Heavy/Framed)
+    price_at = 0 if has_heavy_item else 490
 
-    # Switzerland (+5.00)
-    ch_price = eu_price + 500 
-    
-    # World (+15.00)
-    world_price = eu_price + 1500
+    # EU: 12.90 EUR (16.90 EUR if Heavy/Framed)
+    price_eu = 1690 if has_heavy_item else 1290
+
+    # Non-EU Europe: 19.90 EUR Flat
+    price_non_eu = 1990
+
+    # World: 29.90 EUR Flat
+    price_world = 2990
+
 
     # 3. Create Stripe Session
     stripe.api_key = settings.STRIPE_SECRET_KEY
     
+    # Allowed countries for the address form
+    all_allowed_countries = ['AT'] + get_eu_countries() + get_europe_non_eu() + get_world_countries()
+
     try:
         session = stripe.checkout.Session.create(
             ui_mode='embedded',
@@ -255,61 +160,50 @@ def checkout_page(request):
             mode='payment',
             return_url=f"{request.scheme}://{request.get_host()}{reverse('checkout_success')}?session_id={{CHECKOUT_SESSION_ID}}",
             
-            # Enable Address Collection
+            # Enable Discount Codes
+            allow_promotion_codes=True,
+
+            # Define where we ship to
             shipping_address_collection={
-                'allowed_countries': ['AT', 'DE', 'CH', 'FR', 'IT', 'US', 'GB', 'CA', 'AU'] # Add more as needed
+                'allowed_countries': all_allowed_countries
             },
             
-            # Dynamic Shipping Options
+            # Define Shipping Options (Simplified)
+            # The user will see these 4 options and pick the right one.
             shipping_options=[
                 {
                     'shipping_rate_data': {
                         'type': 'fixed_amount',
-                        'fixed_amount': {'amount': austria_price, 'currency': 'eur'},
-                        'display_name': 'Shipping (Austria)',
-                        'delivery_estimate': {'minimum': {'unit': 'business_day', 'value': 2}, 'maximum': {'unit': 'business_day', 'value': 4}},
-                    },
-                    # APPLY ONLY TO AUSTRIA
-                    'shipping_address_collection_option': {'allowed_countries': ['AT']} 
+                        'fixed_amount': {'amount': price_at, 'currency': 'eur'},
+                        'display_name': 'Shipping to Austria',
+                    }
                 },
                 {
                     'shipping_rate_data': {
                         'type': 'fixed_amount',
-                        'fixed_amount': {'amount': eu_price, 'currency': 'eur'},
-                        'display_name': 'Shipping (EU)',
-                        'delivery_estimate': {'minimum': {'unit': 'business_day', 'value': 5}, 'maximum': {'unit': 'business_day', 'value': 10}},
-                    },
-                    # APPLY TO EU COUNTRIES (excluding AT)
-                    'shipping_address_collection_option': {'allowed_countries': [c for c in get_eu_country_codes() if c != 'AT']}
+                        'fixed_amount': {'amount': price_eu, 'currency': 'eur'},
+                        'display_name': 'Shipping to EU',
+                    }
                 },
                 {
                     'shipping_rate_data': {
                         'type': 'fixed_amount',
-                        'fixed_amount': {'amount': ch_price, 'currency': 'eur'},
-                        'display_name': 'Shipping (Switzerland)',
-                        'delivery_estimate': {'minimum': {'unit': 'business_day', 'value': 5}, 'maximum': {'unit': 'business_day', 'value': 10}},
-                    },
-                    'shipping_address_collection_option': {'allowed_countries': ['CH']}
+                        'fixed_amount': {'amount': price_non_eu, 'currency': 'eur'},
+                        'display_name': 'Shipping to Europe (Non-EU)',
+                    }
                 },
                 {
                     'shipping_rate_data': {
                         'type': 'fixed_amount',
-                        'fixed_amount': {'amount': world_price, 'currency': 'eur'},
-                        'display_name': 'International Shipping',
-                        'delivery_estimate': {'minimum': {'unit': 'business_day', 'value': 10}, 'maximum': {'unit': 'business_day', 'value': 20}},
-                    },
-                    # Apply to major non-EU countries (Add others to 'allowed_countries' above too)
-                    'shipping_address_collection_option': {'allowed_countries': ['US', 'GB', 'CA', 'AU']}
+                        'fixed_amount': {'amount': price_world, 'currency': 'eur'},
+                        'display_name': 'International Shipping (World)',
+                    }
                 },
             ],
-            
-            # Metadata for your backend
-            metadata={
-                'cart_key_list': ",".join(cart_session.keys())
-            }
         )
     except Exception as e:
-        messages.error(request, f"Error connecting to checkout: {e}")
+        print(f"STRIPE ERROR: {e}") # Check terminal for details
+        messages.error(request, f"Error starting checkout: {e}")
         return redirect('/')
 
     return render(request, 'home/checkout.html', {
@@ -319,10 +213,6 @@ def checkout_page(request):
 
 
 def checkout_success(request):
-    """
-    Handles success return from Stripe. 
-    Fetches session details to create the Order in Django.
-    """
     session_id = request.GET.get('session_id')
     cart_session = request.session.get('cart', {})
 
@@ -332,53 +222,47 @@ def checkout_success(request):
     stripe.api_key = settings.STRIPE_SECRET_KEY
     
     try:
-        # Retrieve Session to get customer details
         session = stripe.checkout.Session.retrieve(session_id)
-        customer_details = session.customer_details
-        shipping_details = session.shipping_details
+        customer = session.customer_details
+        shipping = session.shipping_details or customer
         
-        # Create Order in Database
         order = Order.objects.create(
-            first_name=customer_details.name.split(' ')[0] if customer_details.name else "Guest",
-            last_name=" ".join(customer_details.name.split(' ')[1:]) if customer_details.name else "",
-            email=customer_details.email,
-            address=f"{shipping_details.address.line1} {shipping_details.address.line2 or ''}",
-            postal_code=shipping_details.address.postal_code,
-            city=shipping_details.address.city,
-            country=shipping_details.address.country,
+            first_name=customer.name.split(' ')[0] if customer.name else "Guest",
+            last_name=" ".join(customer.name.split(' ')[1:]) if customer.name else "",
+            email=customer.email,
+            address=f"{shipping.address.line1}, {shipping.address.city}" if shipping.address else "N/A",
+            postal_code=shipping.address.postal_code if shipping.address else "",
+            city=shipping.address.city if shipping.address else "",
+            country=shipping.address.country if shipping.address else "",
             stripe_pid=session.payment_intent,
-            paid=True,
-            user=request.user if request.user.is_authenticated else None
+            paid=True
         )
 
-        # Create Order Items
-        real_ids = [key.split('_')[0] for key in cart_session.keys()]
+        real_ids = [k.split('_')[0] for k in cart_session.keys()]
         products = ProductPage.objects.filter(id__in=real_ids)
         product_map = {str(p.id): p for p in products}
 
-        for cart_key, item_data in cart_session.items():
-            if isinstance(item_data, dict):
-                product = product_map.get(str(item_data['product_id']))
-                if product:
+        for key, item in cart_session.items():
+            if isinstance(item, dict):
+                prod = product_map.get(str(item['product_id']))
+                if prod:
                     OrderItem.objects.create(
                         order=order,
-                        product=product,
-                        price=item_data['price'],
-                        quantity=item_data['quantity'],
-                        size_name=item_data.get('size_name', ''),
-                        framed=item_data.get('framed', False)
+                        product=prod,
+                        price=item['price'],
+                        quantity=item['quantity'],
+                        size_name=item.get('size_name', ''),
+                        framed=item.get('framed', False)
                     )
 
-        # Clear Cart
-        if 'cart' in request.session:
-            del request.session['cart']
+        request.session['cart'] = {}
         request.session.modified = True
         
         return render(request, 'home/checkout_done.html', {'order': order})
 
     except Exception as e:
-        return HttpResponseBadRequest(f"Error processing order: {str(e)}")
+        return HttpResponseBadRequest(f"Error: {str(e)}")
 
-
-# ... (Keep checkout_done_page logic if needed, or remove if unused) ...
-# ... (Keep auth views) ...
+# --- Auth Views ---
+def login_view(request): return redirect('/')
+def logout_view(request): return redirect('/')
