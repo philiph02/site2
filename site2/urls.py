@@ -13,15 +13,15 @@ urlpatterns = [
     path("documents/", include(wagtaildocs_urls)),
     path("search/", search_views.search, name="search"),
     
-    # Cart
     path("cart/add/<int:product_id>/", home_views.add_to_cart, name="add_to_cart"),
     path("cart/remove_one/<str:product_id>/", home_views.remove_one_from_cart, name="remove_one_from_cart"),
 
-    # Checkout (One Step)
     path("checkout/", home_views.checkout_page, name="checkout"),
+    
+    path("checkout/calculate-shipping/", home_views.calculate_shipping_options, name="calculate_shipping_options"),
+
     path("checkout/success/", home_views.checkout_success, name="checkout_success"),
 
-    # Auth
     path("login/", home_views.login_view, name="login_view"),
     path("logout/", home_views.logout_view, name="logout_view"),
 ]
