@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="{% static 'home/assets_shop/css/style.css' %}?v=1.0.9">
     <link rel="stylesheet" href="{% static 'home/assets_shop/css/colors/color-1.css' %}">
 
-<style>
+    <style>
     /* --- TOGGLE BUTTON STYLES --- */
     .option-toggle {
       display: grid;
@@ -15,7 +15,6 @@
       gap: 1rem; 
       max-width: 100%;
       margin-bottom: 1rem; 
-      /* FIX FOR CUT-OFF: Add padding so badges have space to exist outside the grid */
       padding: 8px; 
     }
     .opt {
@@ -30,10 +29,8 @@
       background: var(--container-color);
       color: var(--text-color);
       transition: all 0.2s ease;
-      
-      /* FIX FOR CUT-OFF: Allow badge to stick out */
       overflow: visible !important; 
-      z-index: 1; /* Ensure button is below badge */
+      z-index: 1; 
     }
     .opt:hover {
       border-color: var(--text-color);
@@ -44,56 +41,31 @@
       border-color: #575757;
       font-weight: var(--font-medium);
     }
-    /* Hide the actual radio button */
     .opt input[type="radio"] {
-        position: absolute;
-        opacity: 0;
-        width: 0;
-        height: 0;
+        position: absolute; opacity: 0; width: 0; height: 0;
     }
 
-    /* --- UPDATED BADGE DESIGN (Red Box, White Text) --- */
+    /* --- FREE SHIPPING BADGE --- */
     .shipping-badge {
         position: absolute;
-        /* Adjust positioning to sit nicely on the corner */
-        top: -8px;
-        right: -8px;
-        
-        /* Red background & Red border */
+        top: -8px; right: -8px;
         background: #e74c3c; 
         border: 1px solid #e74c3c;
-        
-        /* White Text */
         color: white;      
-        
-        /* Smaller Size */
-        font-size: 0.62rem; 
+        font-size: 0.55rem; 
         font-weight: 600;
         padding: 0.15rem 0.35rem;
         border-radius: 0.2rem;
         line-height: 1.2;
-        text-transform: uppercase; /* Optional: looks cleaner small */
-        
-        /* Visuals */
+        text-transform: uppercase;
         white-space: nowrap; 
         box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-        z-index: 10; /* Ensure it sits on top of everything */
+        z-index: 10; 
     }
-</style>
+    </style>
 {% endblock %}
 
 {% block content %}
-
-<div class="cart" id="cart">
-    <i class="bx bx-x cart__close" id="cart-close"></i>
-    <h2 class="cart__title-center">My Cart</h2>
-    <div class="cart__container">
-        </div>
-    <div class="cart__prices">
-        <span class="cart__prices-item">0 item</span>
-        <span class="cart__prices-total">0.00 €</span>
-    </div>
-</div>
 
 <main class="main">
     <section class="details section container">
@@ -118,7 +90,6 @@
 
                 <div class="details__prices">
                     <span class="details__price" id="product-price">--.-- €</span>
-                    
                     <span id="free-shipping-text" style="display: none; color: #e74c3c; font-size: var(--small-font-size); font-weight: var(--font-medium); margin-left: 1rem; background: rgba(231, 76, 60, 0.1); padding: 0.25rem 0.5rem; border-radius: 0.25rem;">
                         Free Shipping
                     </span>
@@ -130,7 +101,6 @@
                         Choose between A2 (42.0 x 59.4 cm) and A3 (29.7 x 42.0 cm) formats, available with or 
                         without a high-quality frame to perfectly match your space.
                     </p>
-                    
                     <div class="simple-description">
                         {{ page.description_text | linebreaks }}
                     </div>
@@ -141,27 +111,29 @@
                     
                     {% with all_variants as variants %}
                         {% if variants %}
-                            
-                            <div class="option-toggle" role="group" aria-label="Größe" style="margin-bottom: 1rem;">
+                            <div class="option-toggle" role="group" aria-label="Größe">
                                 {% for variant in variants %}
                                 <label class="opt {% if forloop.first %}is-active{% endif %}">
-                                    <input type="radio" 
-                                           name="size_variant" 
-                                           id="size_{{ variant.id }}" 
-                                           value="{{ variant.id }}" 
-                                           {% if forloop.first %}checked{% endif %}>
-                                   <span>{{ variant.size_name }}</span>
-
+                                    <input type="radio" name="size_variant" value="{{ variant.id }}" {% if forloop.first %}checked{% endif %}>
+                                    <span>{{ variant.size_name }}</span>
                                     {% if "A2" in variant.size_name %}
-                                        <div class="shipping-badge">
-                                            Free Shipping
-                                        </div>
+                                        <div class="shipping-badge">Free Shipping</div>
                                     {% endif %}
                                 </label>
                                 {% endfor %}
                             </div>
                             
-                            {% include "home/components/option_toggle.html" with name="add_frame" id_off="frame_no" id_on="frame_yes" label_off="No Frame" label_on="With Frame" value=False with_badge=True %}
+                            <div class="option-toggle" role="group" aria-label="Frame Option">
+                                <label class="opt is-active">
+                                    <input type="radio" name="add_frame" value="false" checked>
+                                    <span>No Frame</span>
+                                </label>
+                                <label class="opt">
+                                    <input type="radio" name="add_frame" value="true">
+                                    <span>With Frame</span>
+                                    <div class="shipping-badge">Free Shipping</div>
+                                </label>
+                            </div>
                         
                         {% else %}
                             <p>Dieses Produkt ist derzeit nicht verfügbar.</p>
@@ -188,13 +160,6 @@
                             {% endif %}
                             <h3 class="shop__title">{{ product.title }}</h3>
                         </a>
-                        
-                        {% if product.orientation %}
-                            <span class="shop__subtitle">{{ product.orientation | title }}</span>
-                        {% else %}
-                            <span class="shop__subtitle">Product</span>
-                        {% endif %}
-
                         <div class="shop__prices">
                             {% with all_variants|first as first_variant %}
                                 {% if first_variant %}
@@ -225,21 +190,6 @@
     <span class="footer__copy">&#169; Crypticalcoder. All rights reserved</span>
 </footer>
 
-<div class="lightbox">
-    <div class="lightbox__content">
-        <div class="lightbox__close">&times;</div>
-        <img src="" alt="" class="lightbox__img">
-        <div class="lightbox__caption">
-            <div class="caption__text">cumulophib</div>
-            <div class="caption__counter"></div>
-        </div>
-    </div>
-    <div class="lightbox__controls">
-        <div class="prev__item" onclick="prevItem()"><i class="bx bx-chevron-left"></i></div>
-        <div class="next__item" onclick="nextItem()"><i class="bx bx-chevron-right"></i></div>
-    </div>
-</div>
-
 <a href="#" class="scrollup" id="scroll-up"><i class="bx bx-up-arrow-alt scrollup__icon"></i></a>
 
 <script src="{% static 'home/assets_shop/js/swiper-bundle.min.js' %}"></script>
@@ -250,9 +200,6 @@
 {% block extra_js %}
     {{ block.super }}
 
-    <script src="{% static 'home/assets_shop/js/swiper-bundle.min.js' %}?v=1.0.9"></script>
-    <script src="{% static 'home/assets_shop/js/main.js' %}?v=1.0.9"></script>
-
     <script>
     (function() {
         const toggles = document.querySelectorAll('.option-toggle');
@@ -262,43 +209,13 @@
                 input.addEventListener('change', function() {
                     const labels = toggle.querySelectorAll('.opt');
                     labels.forEach(label => label.classList.remove('is-active'));
-                    if (this.checked) {
-                        this.parentElement.classList.add('is-active');
-                    }
+                    if (this.checked) this.parentElement.classList.add('is-active');
                 });
             });
         });
     })();
     </script>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        try {
-            const urlParams = new URLSearchParams(window.location.search);
-            const sizeId = urlParams.get('size');
-            const frame = urlParams.get('frame'); // "true" or "false"
-
-            if (sizeId) {
-                const sizeInput = document.querySelector('input[name="size_variant"][value="' + sizeId + '"]');
-                if (sizeInput) {
-                    sizeInput.checked = true;
-                    // Trigger visual update manually since 'change' doesn't fire on programmatic set
-                    sizeInput.dispatchEvent(new Event('change'));
-                }
-            }
-            
-            if (frame) {
-                // Frame uses boolean strings in value, e.g., "true"
-                const frameInput = document.querySelector('input[name="add_frame"][value="' + frame + '"]');
-                if (frameInput) {
-                    frameInput.checked = true;
-                    frameInput.dispatchEvent(new Event('change'));
-                }
-            }
-        } catch (e) { console.error(e); }
-    });
-    </script>
-    
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         const priceData = {
@@ -323,40 +240,57 @@
 
                 if(!selectedSizeInput || !selectedFrameInput) return;
 
-                const selectedSizeId = selectedSizeInput.value;
-                const selectedFrame = selectedFrameInput.value;
-
-                const variantData = priceData[selectedSizeId];
+                const variantData = priceData[selectedSizeInput.value];
                 if (!variantData) return;
 
                 let finalPrice = variantData.base;
-                if (selectedFrame === 'true') {
+                if (selectedFrameInput.value === 'true') {
                     finalPrice += variantData.frame_addon;
                 }
                 priceDisplay.textContent = finalPrice.toFixed(2) + ' €';
 
+                // Show "Free Shipping" text if A2 or Framed
                 const isA2 = variantData.name.toUpperCase().includes("A2");
-                const isFramed = (selectedFrame === 'true');
+                const isFramed = (selectedFrameInput.value === 'true');
 
                 if (isA2 || isFramed) {
                     shippingText.style.display = 'inline-block';
                 } else {
                     shippingText.style.display = 'none';
                 }
-            
             } catch (e) { console.log("Update error:", e.message); }
         }
 
         sizeRadios.forEach(r => r.addEventListener('change', updatePrice));
         frameRadios.forEach(r => r.addEventListener('change', updatePrice));
-        
-        // Run once to set initial price (handles re-selected values)
-        setTimeout(updatePrice, 100); 
+
+        // 3. RESTORE SELECTION FROM URL (THE FIX YOU WANTED)
+        const urlParams = new URLSearchParams(window.location.search);
+        const sizeId = urlParams.get('size');
+        const frameVal = urlParams.get('frame');
+
+        if (sizeId) {
+            const sizeInput = document.querySelector(`input[name="size_variant"][value="${sizeId}"]`);
+            if (sizeInput) {
+                sizeInput.checked = true;
+                sizeInput.dispatchEvent(new Event('change'));
+            }
+        }
+
+        if (frameVal) {
+            const frameInput = document.querySelector(`input[name="add_frame"][value="${frameVal}"]`);
+            if (frameInput) {
+                frameInput.checked = true;
+                frameInput.dispatchEvent(new Event('change'));
+            }
+        }
+
+        // Run once to set initial state
+        updatePrice();
     });
     </script>
     
     <script>
-        // ... (Your existing lightbox script here) ...
         const productItems = document.querySelectorAll(".product__img"),
               totalProductItems = productItems.length,
               lightbox = document.querySelector(".lightbox"),

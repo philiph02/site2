@@ -89,16 +89,33 @@ window.addEventListener('scroll', scrollHeader)
 
 /*=============== NEW SWIPER ===============*/
 var printsSwiper = new Swiper('.new-swiper', {
+    // DEFAULT (Mobile)
     slidesPerView: 3,
-    grid: { rows: 3, fill: 'row' },
+    grid: {
+        rows: 3, // 3 Rows * 3 Cols = 9 Items total
+        fill: 'row'
+    },
     spaceBetween: 30,
     pagination: { el: '.prints-pagination', clickable: true },
     navigation: {
         nextEl: ".prints-swiper-wrapper .swiper-button-next",
         prevEl: ".prints-swiper-wrapper .swiper-button-prev",
+    },
+    
+    // RESPONSIVE SETTINGS (Optional - Adjust as you like)
+    breakpoints: {
+        // Tablet: Show 3 cols, 3 rows (9 items)
+        768: {
+            slidesPerView: 3,
+            grid: { rows: 3 }
+        },
+        // Desktop: Show 3 cols, 3 rows (9 items)
+        1024: {
+            slidesPerView: 3,
+            grid: { rows: 3 }
+        }
     }
 });
-
 
 
 /*=============== SHOW SCROLL UP ===============*/ 

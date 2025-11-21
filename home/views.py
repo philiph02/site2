@@ -1,13 +1,14 @@
 import json
 import stripe
 from django.shortcuts import redirect, render
-from django.http import HttpResponseBadRequest, JsonResponse
+from django.http import HttpResponseBadRequest, JsonResponse, QueryDict
 from django.conf import settings 
 from django.urls import reverse
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
+from urllib.parse import urlparse, urlunparse # <-- Added for URL manipulation
 
 from .models import ProductPage, Order, OrderItem, PrintSizePrice
 
@@ -19,39 +20,12 @@ def get_europe_non_eu():
     return ['CH', 'GB', 'NO', 'IS', 'LI', 'AL', 'AD', 'BA', 'ME', 'MK', 'RS', 'TR']
 
 def get_world_countries():
-    return ['US', 'CA', 'AU', 'NZ', 'JP', 'SG', 'AE', 'QA', 'KR', 'CN', 'HK', 'IN']
-
-def calculate_cart_shipping(cart_session, country_code):
-    has_heavy_item = False
-    for k, item in cart_session.items():
-        if isinstance(item, dict):
-            size = item.get('size_name', '')
-            framed = item.get('framed', False)
-            if 'A2' in str(size).upper() or framed:
-                has_heavy_item = True
-    
-    price_cents = 2990
-    label = "International Shipping"
-
-    if country_code == 'AT':
-        if has_heavy_item: price_cents = 0; label = "Free Shipping (Austria)"
-        else: price_cents = 490; label = "Standard Shipping (Austria)"
-    elif country_code in get_eu_countries():
-        price_cents = 1690 if has_heavy_item else 1290
-        label = "Standard Shipping (EU)"
-    elif country_code in get_europe_non_eu():
-        price_cents = 1990
-        label = "Shipping (Europe Non-EU)"
-        
-    return price_cents, label
+    return ['US', 'CA', 'AU', 'NZ', 'JP', 'SG', 'AE', 'QA', 'KR']
 
 # --- Cart Views ---
 def add_to_cart(request, product_id):
-    try: 
-        product = ProductPage.objects.get(id=product_id)
-    except ProductPage.DoesNotExist: 
-        return HttpResponseBadRequest("Product not found")
-    
+    try: product = ProductPage.objects.get(id=product_id)
+    except: return HttpResponseBadRequest("Product not found")
     cart = request.session.get('cart', {})
     
     # 1. Get Inputs
@@ -61,9 +35,10 @@ def add_to_cart(request, product_id):
         except: quantity = 1
             
     size_id = request.POST.get('size_variant')
-    add_frame = (request.POST.get('add_frame', 'false') == 'true')
+    add_frame_str = request.POST.get('add_frame', 'false')
+    add_frame = (add_frame_str == 'true')
     
-    # 2. Calculate Price (FIXED: No longer uses product.price)
+    # 2. Calculate Price
     size_name = "Standard"
     price_to_add = 0 
     
@@ -73,18 +48,13 @@ def add_to_cart(request, product_id):
             size_name = v.size_name
             price_to_add = v.base_price
             if add_frame: price_to_add += v.frame_addon_price
-        except PrintSizePrice.DoesNotExist: 
-            pass
-
-    # Fallback: If for some reason price is still 0, pick the first variant
+        except: pass
+    
+    # Fallback if price is 0
     if price_to_add == 0:
-        v = PrintSizePrice.objects.order_by('base_price').first()
-        if v:
-            size_name = v.size_name
-            price_to_add = v.base_price
-            # Frame logic defaults to false here
+        v = PrintSizePrice.objects.first()
+        if v: price_to_add = v.base_price
 
-    # 3. Add to Cart
     cart_key = f"{product.id}_{size_id}_{add_frame}"
     
     if cart_key in cart:
@@ -102,7 +72,23 @@ def add_to_cart(request, product_id):
     request.session['cart'] = cart
     request.session.modified = True
     messages.success(request, f"Added {product.title} to cart")
-    return redirect(request.META.get('HTTP_REFERER', '/'))
+
+    # --- FIX: Redirect with Parameters ---
+    referer = request.META.get('HTTP_REFERER', '/')
+    if referer:
+        parsed = urlparse(referer)
+        query = QueryDict(parsed.query, mutable=True)
+        query['size'] = size_id
+        query['frame'] = add_frame_str
+        
+        new_query = query.urlencode()
+        new_url = urlunparse((
+            parsed.scheme, parsed.netloc, parsed.path, 
+            parsed.params, new_query, parsed.fragment
+        ))
+        return redirect(new_url)
+        
+    return redirect(referer)
 
 def remove_one_from_cart(request, product_id):
     cart = request.session.get('cart', {})
@@ -111,37 +97,15 @@ def remove_one_from_cart(request, product_id):
     request.session.modified = True
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
-# --- API: Update Shipping ---
-@csrf_exempt
-def update_cart_shipping(request):
-    if request.method != 'POST': return JsonResponse({'error': 'POST required'}, status=400)
-    data = json.loads(request.body)
-    country = data.get('country')
-    
-    request.session['shipping_country'] = country
-    request.session.modified = True
-    
-    cart = request.session.get('cart', {})
-    shipping_cents, label = calculate_cart_shipping(cart, country)
-    
-    product_total = 0
-    for k, item in cart.items():
-        if isinstance(item, dict): product_total += float(item['price']) * int(item['quantity'])
-            
-    total = product_total + (shipping_cents / 100)
-    
-    return JsonResponse({
-        'shipping_cost': f"{shipping_cents/100:.2f}",
-        'total': f"{total:.2f}",
-        'label': label
-    })
 
-# --- Checkout View ---
+# --- 1. Checkout Page ---
 def checkout_page(request):
     cart_session = request.session.get('cart', {})
     if not cart_session: return redirect('/')
 
+    # Country Logic (Default AT)
     country = request.session.get('shipping_country', 'AT')
+
     stripe_line_items = []
     for k, item in cart_session.items():
         if isinstance(item, dict):
@@ -154,7 +118,9 @@ def checkout_page(request):
                 'quantity': int(item['quantity']),
             })
 
+    # Calculate Shipping
     shipping_cents, shipping_label = calculate_cart_shipping(cart_session, country)
+
     stripe.api_key = settings.STRIPE_SECRET_KEY
 
     try:
@@ -182,6 +148,57 @@ def checkout_page(request):
         'STRIPE_PUBLISHABLE_KEY': settings.STRIPE_PUBLISHABLE_KEY
     })
 
+
+# --- Shipping Helper ---
+def calculate_cart_shipping(cart_session, country_code):
+    has_heavy_item = False
+    for k, item in cart_session.items():
+        if isinstance(item, dict):
+            size = item.get('size_name', '')
+            framed = item.get('framed', False)
+            if 'A2' in str(size).upper() or framed:
+                has_heavy_item = True
+    
+    price_cents = 2990
+    label = "International Shipping"
+
+    if country_code == 'AT':
+        if has_heavy_item: price_cents = 0; label = "Free Shipping (Austria)"
+        else: price_cents = 490; label = "Standard Shipping (Austria)"
+    elif country_code in get_eu_countries():
+        price_cents = 1690 if has_heavy_item else 1290
+        label = "Standard Shipping (EU)"
+    elif country_code in get_europe_non_eu():
+        price_cents = 1990
+        label = "Shipping (Europe Non-EU)"
+        
+    return price_cents, label
+
+# --- API: Update Shipping ---
+@csrf_exempt
+def update_cart_shipping(request):
+    if request.method != 'POST': return JsonResponse({'error': 'POST required'}, status=400)
+    data = json.loads(request.body)
+    country = data.get('country')
+    
+    request.session['shipping_country'] = country
+    request.session.modified = True
+    
+    cart = request.session.get('cart', {})
+    shipping_cents, label = calculate_cart_shipping(cart, country)
+    
+    product_total = 0
+    for k, item in cart.items():
+        if isinstance(item, dict): product_total += float(item['price']) * int(item['quantity'])
+            
+    total = product_total + (shipping_cents / 100)
+    
+    return JsonResponse({
+        'shipping_cost': f"{shipping_cents/100:.2f}",
+        'total': f"{total:.2f}",
+        'label': label
+    })
+
 # --- Success View ---
 def checkout_success(request):
     session_id = request.GET.get('session_id')
@@ -192,7 +209,6 @@ def checkout_success(request):
         cust = session.customer_details
         ship = session.shipping_details or cust
         
-        # Prevent Duplicate Order Creation
         if Order.objects.filter(stripe_pid=session.payment_intent).exists():
             order = Order.objects.get(stripe_pid=session.payment_intent)
             return render(request, 'home/checkout_done.html', {'order': order})
@@ -205,6 +221,7 @@ def checkout_success(request):
             postal_code=ship.address.postal_code, city=ship.address.city, country=ship.address.country,
             stripe_pid=session.payment_intent, paid=True
         )
+        
         cart = request.session.get('cart', {})
         real_ids = [k.split('_')[0] for k in cart.keys()]
         products = {str(p.id): p for p in ProductPage.objects.filter(id__in=real_ids)}

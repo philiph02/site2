@@ -41,62 +41,49 @@
 
 
 <main class="main">
-
-{% load static wagtailcore_tags wagtailimages_tags %}
+ 
 
 <section class="home container">
     <div class="swiper home-swiper">
-        
         <div class="swiper-wrapper">
-            
-            {% for item in featured_slider_items %}
+        
             <section class="swiper-slide">
                 <div class="home__content grid">
-                    
-                    <div class="home__group">
-                        {% image item.slider_image height-800 class="home__img" alt=item.slider_title|striptags %}
-                        
-                        <div class="home__indicator"></div>
-                        
-                        <div class="home__details-img">
-                            <h4 class="home__details-title">{{ item.image_caption_title }}</h4>
-                            <span class="home__details-subtitle">{{ item.image_caption_subtitle }}</span>
-                        </div>
-                    </div>
-
                     <div class="home__data">
-                        <h3 class="home__subtitle">{{ item.slider_subtitle }}</h3>
-                        
-                        <div class="home__title">{{ item.slider_title|richtext }}</div>
-                        
-                        <div class="home__description">
-                            {{ item.slider_description|linebreaks }}
-                        </div>
-
-                        <div class="home__buttons" style="margin-top: 3.5rem;">
-                            {% if item.product_to_link %}
-                                <a href="{% pageurl item.product_to_link %}" class="button">Buy Now</a>
-                                <a href="{% pageurl item.product_to_link %}" class="button--link button--flex">
-                                    View Details <i class="bx bx-right-arrow-alt button__icon"></i>
-                                </a>
-                            {% else %}
-                                <a href="#" class="button">Buy Now</a>
-                                <a href="#" class="button--link button--flex">
-                                    View Details <i class="bx bx-right-arrow-alt button__icon"></i>
-                                </a>
-                            {% endif %}
+                        <div class="home__buttons">
+                            <a href="{% if slider_product_1 %}{% pageurl slider_product_1 %}{% else %}#{% endif %}" class="button">Buy Now</a>
+                            <a href="{% if slider_product_1 %}{% pageurl slider_product_1 %}{% else %}#{% endif %}" class="button--link button--flex">View Details <i class="bx bx-right-arrow-alt button__icon"></i></a>
                         </div>
                     </div>
                 </div>
             </section>
-            {% endfor %}
-
+            
+            <section class="swiper-slide">
+                <div class="home__content grid">
+                    <div class="home__data">
+                        <div class="home__buttons">
+                            <a href="{% if slider_product_2 %}{% pageurl slider_product_2 %}{% else %}#{% endif %}" class="button">Buy Now</a>
+                            <a href="{% if slider_product_2 %}{% pageurl slider_product_2 %}{% else %}#{% endif %}" class="button--link button--flex">View Details <i class="bx bx-right-arrow-alt button__icon"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="swiper-slide">
+                <div class="home__content grid">
+                    <div class="home__data">
+                        <div class="home__buttons">
+                            <a href="{% if slider_product_3 %}{% pageurl slider_product_3 %}{% else %}#{% endif %}" class="button">Buy Now</a>
+                            <a href="{% if slider_product_3 %}{% pageurl slider_product_3 %}{% else %}#{% endif %}" class="button--link button--flex">View Details <i class="bx bx-right-arrow-alt button__icon"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
 
         <div class="swiper-pagination home-pagination"></div>
     </div>
 </section>
-
 
     <section class="new section">
     <h2 class="section__title">Prints</h2>
