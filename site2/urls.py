@@ -15,11 +15,11 @@ urlpatterns = [
     
     path("cart/add/<int:product_id>/", home_views.add_to_cart, name="add_to_cart"),
     path("cart/remove_one/<str:product_id>/", home_views.remove_one_from_cart, name="remove_one_from_cart"),
+    
+    # --- NEW API for Cart Dropdown ---
+    path("api/update-cart-shipping/", home_views.update_cart_shipping, name="update_cart_shipping"),
 
     path("checkout/", home_views.checkout_page, name="checkout"),
-    
-    path("checkout/calculate-shipping/", home_views.calculate_shipping_options, name="calculate_shipping_options"),
-
     path("checkout/success/", home_views.checkout_success, name="checkout_success"),
 
     path("login/", home_views.login_view, name="login_view"),

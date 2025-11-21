@@ -23,48 +23,97 @@
         {% endif %}
 
         <link rel="stylesheet" type="text/css" href="{% static 'css/site2.css' %}">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
         
-        {# This block loads Shop CSS OR Photography CSS #}
         {% block extra_head %}
         {% endblock %}
 
         <style>
+            /* --- CART IMAGE SIZE --- */
+            .cart__img {
+                /* ADJUST IMAGE SIZE HERE */
+                width: 180px !important; 
+                border-radius: 0.5rem;
+                object-fit: cover;
+            }
+
+            /* --- CART COUNT BADGE --- */
+            .cart-count-badge {
+                position: absolute;
+                top: -6px;
+                right: -10px;
+                
+                color: #000000;
+                border-radius: 50%;
+                padding: 2px 6px;
+                font-size: 15px;
+              
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 16px;
+                height: 16px;
+            }
+
+            /* --- MESSAGES --- */
             .django-messages {
-                position: fixed;
-                top: 8rem; /* Below the header */
-                right: 1.5rem;
-                z-index: 2000; /* Above everything */
-                list-style-type: none;
-                padding: 0;
-                margin: 0;
-                width: 300px;
+                position: fixed; top: 8rem; right: 1.5rem; z-index: 2200;
+                list-style-type: none; padding: 0; margin: 0; width: 300px;
             }
             .django-messages li {
-                display: block; /* Ensure it's visible */
-                padding: 1rem 1.5rem;
-                margin-bottom: 1rem;
-                border-radius: .5rem;
-                color: #fff;
-                font-weight: var(--font-medium);
+                display: block; padding: 1rem 1.5rem; margin-bottom: 1rem;
+                border-radius: .5rem; color: #fff; font-weight: var(--font-medium);
                 box-shadow: 0 4px 12px hsla(0, 0%, 0%, 0.2);
-                background-color: var(--title-color); /* Default/Info */
-                opacity: 1;
-                transition: opacity 0.5s ease, transform 0.5s ease;
+                background-color: var(--title-color); 
+                opacity: 1; transition: opacity 0.5s ease, transform 0.5s ease;
             }
-            .django-messages li.success {
-                background-color: hsl(142, 69%, 45%); /* Green */
+            .django-messages li.success { background-color: hsl(142, 69%, 45%); }
+            .django-messages li.error { background-color: hsl(0, 80%, 60%); }
+            .django-messages li.warning { background-color: hsl(45, 100%, 50%); }
+
+            /* --- CART LAYOUT --- */
+            .cart {
+                width: 100%;
+                max-width: 420px; 
+                z-index: 2100;
+                transition: .4s;
             }
-            .django-messages li.error {
-                background-color: hsl(0, 80%, 60%); /* Red */
+            @media screen and (min-width: 768px) {
+                .cart { max-width: 500px; } /* Wider on desktop */
             }
-            .django-messages li.warning {
-                background-color: hsl(45, 100%, 50%); /* Yellow */
+
+            /* Dark Overlay */
+            .cart-overlay {
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background-color: rgba(0, 0, 0, 0.5); z-index: 2000;
+                opacity: 0; visibility: hidden; transition: .4s;
+                backdrop-filter: blur(2px);
+            }
+            .cart-overlay.show-overlay {
+                opacity: 1; visibility: visible;
+            }
+
+            /* Country Selector */
+            .cart-shipping-select {
+                width: 100%; padding: 12px 16px; margin-bottom: 10px;
+                border: 1px solid var(--text-color-light); 
+                border-radius: 0.5rem; background-color: var(--container-color); 
+                color: var(--title-color); font-size: var(--normal-font-size);
+                cursor: pointer; outline: none; appearance: none;
+                background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23575757%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+                background-repeat: no-repeat; background-position: right 1rem top 50%; background-size: .65rem auto;
+            }
+
+            .cart__checkout .button[disabled] {
+                opacity: 0.5; cursor: not-allowed; background-color: #ccc !important; pointer-events: none;
             }
         </style>
     </head>
 
     <body class="{% block body_class %}{% endblock %}">
         {% wagtailuserbar %}
+        
+        <div class="cart-overlay" id="cart-overlay"></div>
 
         {% if messages %}
             <ul class="django-messages">
@@ -82,144 +131,125 @@
         
                 <div class="nav__menu" id="nav-menu">
                     <ul class="nav__list">
-                        
                         {% if shop_page %}
                             <li class="nav__item"><a href="{% pageurl shop_page %}" class="nav__link {% if page.url == shop_page.url or page.get_parent.url == shop_page.url %}active-link{% endif %}">Shop</a></li>
                         {% endif %}
-
                         {% if photography_page %}
                             <li class="nav__item"><a href="{% pageurl photography_page %}" class="nav__link {% if page.url == photography_page.url %}active-link{% endif %}">Book Me</a></li>
                         {% endif %}
-
                         {% if about_page %}
                             <li class="nav__item"><a href="{% pageurl about_page %}" class="nav__link {% if page.url == about_page.url %}active-link{% endif %}">About Me</a></li>
                         {% endif %}
-                        
                     </ul>
-                    <div class="nav__close" id="nav-close">
-                        <i class="bx bx-x"></i>
-                    </div>
+                    <div class="nav__close" id="nav-close"><i class="bx bx-x"></i></div>
                 </div>
         
                 <div class="nav__btns">
-                    
-                    {% comment %}
-                    {% if user.is_authenticated %}
-                        <div class="nav__user-info" style="display: flex; align-items: center; gap: 1rem; color: var(--title-color);">
-                            <a href="{% url 'logout_view' %}" title="Logout">
-                                <i class="bx bx-log-out" style="font-size: 1.5rem; cursor: pointer;"></i>
-                            </a>
-                        </div>
-                    {% else %}
-                        <div class="login__toggle" id="login-button" title="Login">
-                            <i class="bx bx-user"></i>
-                        </div>
-                    {% endif %}
-                    {% endcomment %}        
-                    <div class="nav__shop" id="cart-shop" title="Cart">
+                    <div class="nav__shop" id="cart-shop" title="Cart" style="position: relative;">
                         <i class="bx bx-shopping-bag"></i>
+                        
                         {% if cart_total_count > 0 %}
-                            <span class="cart-count">{{ cart_total_count }}</span>
+                            <span class="cart-count-badge">{{ cart_total_count }}</span>
                         {% endif %}
+                        
                     </div>
-                    <div class="nav__toggle" id="nav-toggle">
-                        <i class="bx bx-grid-alt"></i>
-                    </div>
+                    <div class="nav__toggle" id="nav-toggle"><i class="bx bx-grid-alt"></i></div>
                 </div>
             </nav>
         </header>
 
-
-{% comment %}
-        <div class="login" id="login">
-            <i class="bx bx-x login__close" id="login-close"></i>
-            <h2 class="login__title-center">Login</h2>
-
-            <form action="{% url 'login_view' %}" method="POST" class="login__form grid">
-                {% csrf_token %} <div class="login__content">
-                    <label for="id_username" class="login__label">Username</label>
-                    <input type="text" name="username" id="id_username" class="login__input" required>
-                </div>
-                
-                <div class="login__content">
-                    <label for="id_password" class="login__label">Password</label>
-                    <input type="password" name="password" id="id_password" class="login__input" required>
-                </div>
-                
-                <div>
-                    <button type="submit" class="button">Sign in</button>
-                </div>
-            </form>
-            
-            <div>
-                {% if registration_page %}
-                    <p class="signup">Not a member? <a href="{% pageurl registration_page %}">Sign up now</a></p>
-                {% else %}
-                    <p class="signup"><span>Registration not available</span></p>
-                {% endif %}
-            </div>
-        </div>
-        {% endcomment %}
-
-<div class="cart" id="cart">
+        <div class="cart" id="cart">
             <i class="bx bx-x cart__close" id="cart-close"></i>
             <h2 class="cart__title-center">My Cart</h2>
-         <div class="cart__container">
+            
+            <div class="cart__container">
                 {% for item in cart_items %}
                     <article class="cart__card">
-                        
-                        <div class="cart__box">
+                        <div class="cart__box" style="background:transparent; padding:0;">
                             {% if item.product.product_image %}
-                                {% image item.product.product_image width-200 class="cart__img" alt=item.product.title %}
+                                {% image item.product.product_image width-300 class="cart__img" alt=item.product.title %}
                             {% endif %}
                         </div>
-
                         <div class="cart__details">
-                            
                             <h3 class="cart__title" style="margin-bottom: 0.1rem;">{{ item.product.title }}</h3>
-                            
                             <span class="cart__options" style="display: block; font-size: var(--smaller-font-size); color: var(--text-color-light); margin-bottom: 0.25rem;">
                                 {{ item.size_name }}{% if item.framed %}, With Frame{% endif %}
                             </span>
-                            
                             <div style="display: flex; align-items: center; gap: 0.8rem;">
                                 <span class="cart__price" style="margin-bottom: 0;">
                                     {{ item.price_per_item }} € (x{{ item.quantity }})
                                 </span>
-
-                                <a href="{% url 'remove_one_from_cart' product_id=item.cart_key %}" style="font-size: 1.2rem; color: var(--first-color); cursor: pointer; display: flex; align-items: center;" title="Remove one">
-                                    <i class="bx bx-trash-alt"></i>
-                                </a>
+                                <a href="{% url 'remove_one_from_cart' product_id=item.cart_key %}" style="font-size: 1.2rem; color: var(--first-color); cursor: pointer;"><i class="bx bx-trash-alt"></i></a>
                             </div>
-
                         </div>
                     </article>
                 {% empty %}
                     <p style="padding: 20px; text-align: center;">Your cart is empty.</p>
                 {% endfor %}
             </div>
-            <div class="cart__prices">
-                <span class="cart__prices-item">{{ cart_total_count }} item(s)</span>
-                <span class="cart__prices-total">{{ cart_total_price }} €</span>
-            </div>
+
             {% if cart_total_count > 0 %}
+            <div class="cart__prices" style="display: block; margin-top: 2rem;">
+                
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="font-size: var(--normal-font-size); font-weight: var(--font-medium); display: block; margin-bottom: 0.5rem; color: var(--title-color);">Shipping Destination:</label>
+                    <select id="cart-country-select" class="cart-shipping-select">
+                        <option value="" disabled selected>-- Select Country --</option>
+                        <option value="AT">Austria (Österreich)</option>
+                        <option value="DE">Germany (Deutschland)</option>
+                        <option value="CH">Switzerland (Schweiz)</option>
+                        <optgroup label="EU Countries">
+                            <option value="FR">France</option>
+                            <option value="IT">Italy</option>
+                            <option value="ES">Spain</option>
+                            <option value="NL">Netherlands</option>
+                            <option value="BE">Belgium</option>
+                        </optgroup>
+                        <optgroup label="Rest of World">
+                            <option value="US">United States</option>
+                            <option value="GB">United Kingdom</option>
+                            <option value="CA">Canada</option>
+                            <option value="AU">Australia</option>
+                            <option value="JP">Japan</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span class="cart__prices-item">Products</span>
+                    <span class="cart__prices-item">{{ cart_total_price }} €</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span class="cart__prices-item">Shipping</span>
+                    <span class="cart__prices-item" id="cart-shipping-cost">--</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--text-color-light); padding-top: 1rem; margin-top: 0.5rem;">
+                    <span class="cart__prices-total" style="font-size: var(--h3-font-size); color: var(--title-color);">Total</span>
+                    <span class="cart__prices-total" id="cart-final-total" style="font-size: var(--h3-font-size); color: var(--title-color);">{{ cart_total_price }} €</span>
+                </div>
+            </div>
+
             <div class="cart__checkout" style="padding: 1.5rem 0rem 1.5rem; text-align: center;">
-                <a href="{% url 'checkout' %}" class="button" style="width: 100%;">Checkout</a>
+                <a href="{% url 'checkout' %}" id="cart-checkout-btn" class="button" style="width: 100%;" disabled>
+                    Proceed to Checkout
+                </a>
+                <p id="select-country-msg" style="font-size: var(--smaller-font-size); color: hsl(0, 80%, 60%); margin-top: 0.5rem;">
+                    Please select a country to calculate total.
+                </p>
             </div>
             {% endif %}
         </div>
         
         {% block content %}{% endblock %}
 
-        
         <footer class="footer section">
             <div class="footer__container container grid">
                 <div class="footer__content">
                     <a href="#" class="footer__logo">
                          <img src="{% static 'home/assets/images/logo_cumulophib.png' %}" alt="Logo" style="height: 2.5em; vertical-align: middle; margin-right: 0.5em;">
                     </a>
-                    <p class="footer__description"> Thank You! </p> <div class="footer__social">
-           
+                    <p class="footer__description"> Thank You! </p> 
+                    <div class="footer__social">
                         <a href="https://www.instagram.com/cumulophib/" class="footer__social-link"><i class="bx bxl-instagram-alt"></i></a>
                     </div>
                 </div>
@@ -231,43 +261,90 @@
             <i class="bx bx-up-arrow-alt scrollup__icon"></i>
         </a>
 
-
         {# Global javascript #}
         <script type="text/javascript" src="{% static 'js/site2.js' %}"></script>
 
         {% block extra_js %}
-            <script>
+        <script>
             document.addEventListener('DOMContentLoaded', () => {
+                
+                // 1. CART LOGIC
                 const cart = document.getElementById('cart');
-                const deleteButtons = document.querySelectorAll('.cart__amount-trash-link');
+                const cartShop = document.getElementById('cart-shop');
+                const cartClose = document.getElementById('cart-close');
+                const cartOverlay = document.getElementById('cart-overlay');
+                
+                function openCart() {
+                    if(cart) cart.classList.add('show-cart');
+                    if(cartOverlay) cartOverlay.classList.add('show-overlay');
+                }
+                function closeCart() {
+                    if(cart) cart.classList.remove('show-cart');
+                    if(cartOverlay) cartOverlay.classList.remove('show-overlay');
+                }
 
+                if(cartShop) cartShop.addEventListener('click', openCart);
+                if(cartClose) cartClose.addEventListener('click', closeCart);
+                if(cartOverlay) cartOverlay.addEventListener('click', closeCart);
+
+                const deleteButtons = document.querySelectorAll('.cart__amount-trash-link');
                 if (cart && sessionStorage.getItem('keepCartOpen') === 'true') {
                     sessionStorage.removeItem('keepCartOpen'); 
                     const totalCount = {{ cart_total_count|default:0 }}; 
-                    if (totalCount > 0) {
-                        cart.classList.add('show-cart'); 
-                    }
+                    if (totalCount > 0) openCart();
                 }
-
                 deleteButtons.forEach(button => {
                     button.addEventListener('click', () => {
                         sessionStorage.setItem('keepCartOpen', 'true');
                     });
                 });
 
-                // NEW: Auto-close success/error messages after 5 seconds
                 const messages = document.querySelectorAll('.django-messages li');
                 messages.forEach((message, index) => {
                     setTimeout(() => {
                         message.style.opacity = '0';
-                        message.style.transform = 'translateX(100%)';
-                        setTimeout(() => {
-                            if (message) message.remove();
-                        }, 500); // Remove from DOM after fade out
-                    }, 5000 + (index * 500)); // Stagger removal
+                        setTimeout(() => message.remove(), 500); 
+                    }, 5000 + (index * 500)); 
                 });
+
+                // 2. SHIPPING LOGIC
+                const countrySelect = document.getElementById('cart-country-select');
+                const checkoutBtn = document.getElementById('cart-checkout-btn');
+                const shippingDisplay = document.getElementById('cart-shipping-cost');
+                const totalDisplay = document.getElementById('cart-final-total');
+                const msg = document.getElementById('select-country-msg');
+
+                if(countrySelect) {
+                    if(checkoutBtn) {
+                        checkoutBtn.style.pointerEvents = "none"; 
+                        checkoutBtn.style.opacity = "0.6";
+                    }
+
+                    countrySelect.addEventListener('change', function() {
+                        const country = this.value;
+                        
+                        fetch("{% url 'update_cart_shipping' %}", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ country: country })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if(shippingDisplay) shippingDisplay.innerText = data.shipping_cost + " €";
+                            if(totalDisplay) totalDisplay.innerText = data.total + " €";
+                            
+                            if(checkoutBtn) {
+                                checkoutBtn.removeAttribute('disabled');
+                                checkoutBtn.style.pointerEvents = "auto";
+                                checkoutBtn.style.opacity = "1";
+                            }
+                            if(msg) msg.style.display = 'none';
+                        })
+                        .catch(err => console.error("Error updating shipping:", err));
+                    });
+                }
             });
-            </script>
+        </script>
         {% endblock %}
     </body>
 </html>
