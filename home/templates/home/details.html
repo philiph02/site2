@@ -260,10 +260,8 @@
             const inputs = toggle.querySelectorAll('input[type="radio"]');
             inputs.forEach(input => {
                 input.addEventListener('change', function() {
-                    // Remove 'is-active' from all labels in this group
                     const labels = toggle.querySelectorAll('.opt');
                     labels.forEach(label => label.classList.remove('is-active'));
-                    // Add 'is-active' to the clicked one
                     if (this.checked) {
                         this.parentElement.classList.add('is-active');
                     }
@@ -278,20 +276,23 @@
         try {
             const urlParams = new URLSearchParams(window.location.search);
             const sizeId = urlParams.get('size');
-            const frame = urlParams.get('frame');
+            const frame = urlParams.get('frame'); // "true" or "false"
 
             if (sizeId) {
                 const sizeInput = document.querySelector('input[name="size_variant"][value="' + sizeId + '"]');
                 if (sizeInput) {
                     sizeInput.checked = true;
-                    sizeInput.dispatchEvent(new Event('change')); 
+                    // Trigger visual update manually since 'change' doesn't fire on programmatic set
+                    sizeInput.dispatchEvent(new Event('change'));
                 }
             }
+            
             if (frame) {
+                // Frame uses boolean strings in value, e.g., "true"
                 const frameInput = document.querySelector('input[name="add_frame"][value="' + frame + '"]');
                 if (frameInput) {
                     frameInput.checked = true;
-                    frameInput.dispatchEvent(new Event('change')); 
+                    frameInput.dispatchEvent(new Event('change'));
                 }
             }
         } catch (e) { console.error(e); }
@@ -317,8 +318,13 @@
 
         function updatePrice() {
             try {
-                const selectedSizeId = document.querySelector('input[name="size_variant"]:checked').value;
-                const selectedFrame = document.querySelector('input[name="add_frame"]:checked').value;
+                const selectedSizeInput = document.querySelector('input[name="size_variant"]:checked');
+                const selectedFrameInput = document.querySelector('input[name="add_frame"]:checked');
+
+                if(!selectedSizeInput || !selectedFrameInput) return;
+
+                const selectedSizeId = selectedSizeInput.value;
+                const selectedFrame = selectedFrameInput.value;
 
                 const variantData = priceData[selectedSizeId];
                 if (!variantData) return;
@@ -329,7 +335,6 @@
                 }
                 priceDisplay.textContent = finalPrice.toFixed(2) + ' €';
 
-                // Logic to show "Free Shipping" TEXT next to price
                 const isA2 = variantData.name.toUpperCase().includes("A2");
                 const isFramed = (selectedFrame === 'true');
 
@@ -344,11 +349,14 @@
 
         sizeRadios.forEach(r => r.addEventListener('change', updatePrice));
         frameRadios.forEach(r => r.addEventListener('change', updatePrice));
-        updatePrice();
+        
+        // Run once to set initial price (handles re-selected values)
+        setTimeout(updatePrice, 100); 
     });
     </script>
     
     <script>
+        // ... (Your existing lightbox script here) ...
         const productItems = document.querySelectorAll(".product__img"),
               totalProductItems = productItems.length,
               lightbox = document.querySelector(".lightbox"),
