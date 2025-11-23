@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+    <link rel="stylesheet" href="{% static 'home/assets_shop/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'home/assets_shop/css/colors/color-1.css' %}">
+    <style>
+        .contact-container {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 4rem;
+            margin-top: 2rem;
+        }
+        
+        /* TEXT STYLING */
+        .contact-intro {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: var(--text-color);
+            font-weight: 400;
+            margin-bottom: 2rem;
+        }
+        .highlight-text {
+            color: var(--title-color);
+            font-weight: 500;
+        }
+
+        /* INFO BOXES */
+        .info-item {
+            margin-bottom: 1.5rem;
+        }
+        .info-label {
+            font-size: var(--small-font-size);
+            color: var(--text-color-light);
+            margin-bottom: 0.25rem;
+            display: block;
+        }
+        .info-value {
+            font-size: 1.1rem;
+            color: var(--title-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .info-value a {
+            color: var(--title-color);
+            transition: .3s;
+        }
+        .info-value a:hover {
+            color: var(--first-color);
+        }
+
+        /* INSTAGRAM CARD */
+        .insta-card {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            text-align: center;
+            margin-top: 2rem;
+            transition: .3s;
+            display: block;
+            text-decoration: none;
+        }
+        .insta-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(220, 39, 67, 0.3);
+            color: white;
+        }
+        .insta-handle {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+            display: block;
+        }
+
+        /* FORM STYLING */
+        .contact-form {
+            background-color: var(--container-color);
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+        }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-label {
+            display: block;
+            font-size: var(--small-font-size);
+            margin-bottom: 0.5rem;
+            color: var(--title-color);
+        }
+        .form-input {
+            width: 100%;
+            background-color: var(--body-color);
+            border: 1px solid #eee;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            outline: none;
+            font-size: var(--normal-font-size);
+            color: var(--text-color);
+            font-family: var(--body-font);
+        }
+        .form-input:focus { border-color: var(--first-color); }
+
+        /* RESPONSIVE */
+        @media screen and (max-width: 768px) {
+            .contact-container { grid-template-columns: 1fr; gap: 3rem; }
+            .contact-form { padding: 1.5rem; }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<main class="main">
+    <section class="section container">
+        <h2 class="section__title" style="font-weight: 400;">Get in Touch</h2>
+        
+        <div class="contact-container">
+            
+            <div class="contact-info">
+                <div class="contact-intro">
+                    <p style="margin-bottom: 1rem;">
+                        Are you interested in <span class="highlight-text">booking me for an event</span>, or would you like to receive a non-binding offer?
+                    </p>
+                    <p>
+                        Also, if you have any questions regarding my <span class="highlight-text">Fine Art Prints</span> or are experiencing technical issues with the shop, please don't hesitate to contact me.
+                    </p>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">Email</span>
+                    <div class="info-value">
+                        <i class='bx bx-envelope'></i>
+                        <a href="mailto:office@cumulophib.com">office@cumulophib.com</a>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">Phone / SMS</span>
+                    <div class="info-value">
+                        <i class='bx bx-phone'></i>
+                        <a href="tel:+436602288024">+43 660 2288024</a>
+                    </div>
+                </div>
+
+                <a href="https://instagram.com/cumulophib" target="_blank" class="insta-card">
+                    <i class='bx bxl-instagram' style="font-size: 2rem;"></i>
+                    <span class="insta-handle">@cumulophib</span>
+                    <div style="font-size: 0.8rem; opacity: 0.9; margin-top: 0.25rem;">Follow my journey</div>
+                </a>
+            </div>
+
+            <form class="contact-form">
+                <div class="form-group">
+                    <label class="form-label">Name</label>
+                    <input type="text" class="form-input" placeholder="Your Name">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" placeholder="Your Email">
+                </div>
+                
+
+
+                <div class="form-group">
+                    <label class="form-label">Message</label>
+                    <textarea class="form-input" rows="5" placeholder="How can I help you?"></textarea>
+                </div>
+
+                <button type="submit" class="button" style="width: 100%;">Send Message</button>
+            </form>
+
+        </div>
+    </section>
+</main>
+{% endblock %}

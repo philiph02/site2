@@ -13,17 +13,26 @@ urlpatterns = [
     path("documents/", include(wagtaildocs_urls)),
     path("search/", search_views.search, name="search"),
     
+    # Cart & API
     path("cart/add/<int:product_id>/", home_views.add_to_cart, name="add_to_cart"),
     path("cart/remove_one/<str:product_id>/", home_views.remove_one_from_cart, name="remove_one_from_cart"),
-    
-    # --- NEW API for Cart Dropdown ---
     path("api/update-cart-shipping/", home_views.update_cart_shipping, name="update_cart_shipping"),
 
+    # Checkout
     path("checkout/", home_views.checkout_page, name="checkout"),
     path("checkout/success/", home_views.checkout_success, name="checkout_success"),
 
+    # Auth (Placeholders)
     path("login/", home_views.login_view, name="login_view"),
     path("logout/", home_views.logout_view, name="logout_view"),
+
+    # --- FOOTER PAGES (NEW) ---
+    path("shipping-information/", home_views.shipping_info_view, name="shipping_information"),
+    path("returns/", home_views.returns_view, name="returns"),
+    path("contact/", home_views.contact_view, name="contact"),
+    path("imprint/", home_views.imprint_view, name="imprint"),
+    path("privacy-policy/", home_views.privacy_view, name="privacy"),
+    path("terms-conditions/", home_views.terms_view, name="terms"),
 ]
 
 if settings.DEBUG:

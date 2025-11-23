@@ -62,9 +62,9 @@
     padding: 0;
 }
 
-html {
+/* html {
     scroll-behavior: smooth;
-}
+} */
 
 body,
 button,
@@ -415,9 +415,9 @@ input {
 .new__container {
     padding-top: 1rem;
 }
-
 .new__img {
-    width: 270px;
+    width: 100%;  /* <--- CHANGED */
+    height: auto; /* Allows height to scale */
     border-radius: 8px;
     margin-bottom: var(--mb-1);
     transition: .3s;
@@ -426,7 +426,7 @@ input {
 .new__content {
     position: relative;
     background-color: var(--container-color);
-    width: 310px;
+    width: 100%;  /* <--- CHANGED to flexible width */
     padding: 1rem 0;
     border-radius: 1rem;
     text-align: center;

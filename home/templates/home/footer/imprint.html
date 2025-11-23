@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+    <link rel="stylesheet" href="{% static 'home/assets_shop/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'home/assets_shop/css/colors/color-1.css' %}">
+    <style>
+        .legal-section { margin-bottom: 4rem; }
+        .legal-divider { border-top: 1px solid #ddd; margin: 3rem 0; }
+        
+        h3 { 
+            margin-top: 1.5rem; 
+            margin-bottom: 0.5rem; 
+            font-size: 1.1rem; 
+            font-weight: 400; 
+            color: var(--title-color);
+        }
+        p { 
+            margin-bottom: 1rem; 
+            line-height: 1.6; 
+            color: var(--text-color); 
+            font-weight: 400; 
+        }
+        a { color: var(--first-color); }
+        
+        /* Custom class to replace strong tags */
+        .label-text { color: var(--title-color); }
+    </style>
+{% endblock %}
+
+{% block content %}
+<main class="main">
+    <section class="section container">
+        <h2 class="section__title" style="font-weight: 400;">Imprint / Impressum</h2>
+
+        <div class="legal-section">
+            <h3>Legal Notice</h3>
+            <p><span class="label-text">Media Owner & Publisher:</span><br>
+            Philip Moritz Heinrich<br>
+            Professional Photographer (Berufsfotograf)</p>
+
+            <p><span class="label-text">Address:</span><br>
+            Gussenbauergasse 5-7/3/8<br>
+            1090 Vienna (Wien)<br>
+            Austria (Österreich)</p>
+
+            <p><span class="label-text">Contact:</span><br>
+            For inquiries, please use the form on our <a href="{% url 'contact' %}">Contact Page</a>.</p>
+
+            <h3>Business Information</h3>
+            <p><span class="label-text">GISA Number:</span> 37914028<br>
+            <span class="label-text">Chamber Membership:</span> Member of the Austrian Economic Chamber (WKO) Vienna<br>
+            <span class="label-text">Applicable Legislation:</span> Trade Regulation Act (Gewerbeordnung - <a href="https://www.ris.bka.gv.at" target="_blank">www.ris.bka.gv.at</a>)<br>
+            <span class="label-text">Supervisory Authority:</span> Magistrat der Stadt Wien</p>
+
+            <p><span class="label-text">Small Business Regulation:</span><br>
+            I am a small business owner (Kleinunternehmer) according to Austrian tax law. VAT is not charged.</p>
+
+            <h3>Online Dispute Resolution</h3>
+            <p>Consumers have the option to submit complaints to the EU's Online Dispute Resolution platform: <a href="http://ec.europa.eu/odr" target="_blank">http://ec.europa.eu/odr</a>. You can also address any complaints via our contact page.</p>
+        </div>
+
+        <div class="legal-divider"></div>
+
+        <div class="legal-section">
+            <h3>Impressum</h3>
+            <p><span class="label-text">Medieninhaber & Herausgeber:</span><br>
+            Philip Moritz Heinrich<br>
+            Berufsfotograf</p>
+
+            <p><span class="label-text">Anschrift:</span><br>
+            Gussenbauergasse 5-7/3/8<br>
+            1090 Wien<br>
+            Österreich</p>
+
+            <p><span class="label-text">Kontakt:</span><br>
+            Für Anfragen nutzen Sie bitte das Formular auf unserer <a href="{% url 'contact' %}">Kontaktseite</a>.</p>
+
+            <h3>Unternehmensdaten</h3>
+            <p><span class="label-text">GISA-Zahl:</span> 37914028<br>
+            <span class="label-text">Kammerzugehörigkeit:</span> Mitglied der WKO Wien<br>
+            <span class="label-text">Anwendbare Rechtsvorschriften:</span> Gewerbeordnung (<a href="https://www.ris.bka.gv.at" target="_blank">www.ris.bka.gv.at</a>)<br>
+            <span class="label-text">Aufsichtsbehörde/Gewerbebehörde:</span> Magistrat der Stadt Wien</p>
+
+            <p><span class="label-text">Kleinunternehmerregelung:</span><br>
+            Ich bin Kleinunternehmer im Sinne des UStG. Es wird keine Umsatzsteuer verrechnet.</p>
+
+            <h3>Online-Streitbeilegung</h3>
+            <p>Verbraucher haben die Möglichkeit, Beschwerden an die Online-Streitbeilegungsplattform der EU zu richten: <a href="http://ec.europa.eu/odr" target="_blank">http://ec.europa.eu/odr</a>. Sie können allfällige Beschwerden auch über unsere Kontaktseite einreichen.</p>
+        </div>
+    </section>
+</main>
+{% endblock %}

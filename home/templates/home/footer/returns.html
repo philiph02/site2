@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+    <link rel="stylesheet" href="{% static 'home/assets_shop/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'home/assets_shop/css/colors/color-1.css' %}">
+    <style>
+        .legal-section { margin-bottom: 4rem; }
+        .legal-divider { border-top: 1px solid #ddd; margin: 3rem 0; }
+        
+        h3 { 
+            margin-top: 1.5rem; 
+            margin-bottom: 0.5rem; 
+            font-size: 1.1rem; 
+            font-weight: 400; 
+            color: var(--title-color);
+        }
+        p { margin-bottom: 1rem; line-height: 1.6; color: var(--text-color); font-weight: 400; }
+        a { color: var(--first-color); }
+    </style>
+{% endblock %}
+
+{% block content %}
+<main class="main">
+    <section class="section container">
+        <h2 class="section__title" style="font-weight: 400;">Returns & Withdrawal / Rücksendungen</h2>
+
+        <div class="legal-section">
+            <h3>Right of Withdrawal</h3>
+            <p>You have the right to withdraw from this contract within 14 days without giving any reason. The withdrawal period will expire after 14 days from the day on which you acquire physical possession of the goods.</p>
+
+            <h3>How to Return</h3>
+            <p>To exercise your right of withdrawal, the best way is to contact me directly to coordinate the return.</p>
+            <p>Please use the form on the <a href="{% url 'contact' %}">Contact Page</a> to let me know.</p>
+
+            <h3>Condition of Goods</h3>
+            <p>Please note that returns can only be accepted if the products are in their original condition: unused, undamaged, and (if applicable) unopened.</p>
+
+            <h3>Return Costs</h3>
+            <p>You will have to bear the direct cost of returning the goods. Once I receive the returned item in good condition, I will reimburse your payment.</p>
+        </div>
+
+        <div class="legal-divider"></div>
+
+        <div class="legal-section">
+            <h3>Widerrufsrecht</h3>
+            <p>Sie haben das Recht, binnen 14 Tagen ohne Angabe von Gründen diesen Vertrag zu widerrufen. Die Widerrufsfrist beträgt 14 Tage ab dem Tag, an dem Sie die Waren in Besitz genommen haben.</p>
+
+            <h3>Rücksendung Abwickeln</h3>
+            <p>Um Ihr Widerrufsrecht auszuüben, nehmen Sie am besten direkt Kontakt mit mir auf, um die Rücksendung zu koordinieren.</p>
+            <p>Bitte nutzen Sie das Formular auf der <a href="{% url 'contact' %}">Kontaktseite</a>.</p>
+
+            <h3>Zustand der Ware</h3>
+            <p>Bitte beachten Sie, dass Rücksendungen nur akzeptiert werden können, wenn sich die Ware im Originalzustand befindet: unbenutzt, unbeschädigt und (falls zutreffend) ungeöffnet.</p>
+
+            <h3>Kosten der Rücksendung</h3>
+            <p>Sie tragen die unmittelbaren Kosten der Rücksendung der Waren. Sobald die Ware in einwandfreiem Zustand bei mir eingegangen ist, erstatte ich Ihre Zahlung zurück.</p>
+        </div>
+    </section>
+</main>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+    <link rel="stylesheet" href="{% static 'home/assets_shop/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'home/assets_shop/css/colors/color-1.css' %}">
+    <style>
+        .legal-section { margin-bottom: 4rem; }
+        .legal-divider { border-top: 1px solid #ddd; margin: 3rem 0; }
+        
+        h3 { 
+            margin-top: 1.5rem; 
+            margin-bottom: 0.5rem; 
+            font-size: 1.1rem; 
+            color: var(--title-color);
+            font-weight: 400; 
+        }
+        p { margin-bottom: 1rem; line-height: 1.6; color: var(--text-color); font-weight: 400; }
+        .label-text { color: var(--title-color); }
+    </style>
+{% endblock %}
+
+{% block content %}
+<main class="main">
+    <section class="section container">
+        <h2 class="section__title" style="font-weight: 400;">Terms & Conditions / AGB</h2>
+
+        <div class="legal-section">
+            <h3>1. Scope</h3>
+            <p>These Terms apply to all orders placed via this online shop by Philip Moritz Heinrich (Small Business).</p>
+
+            <h3>2. Copyright & Usage</h3>
+            <p>Purchased prints are for <span class="label-text">private, non-commercial use only</span>. Reproduction, scanning, digital distribution, or publishing is strictly prohibited. Copyright remains with the photographer.</p>
+
+            <h3>3. Production & Shipping</h3>
+            <p><span class="label-text">Production Time:</span> High-quality prints are produced on demand. I reserve the right to a production time of up to 14 days before shipping, though it is usually faster.</p>
+            <p><span class="label-text">Delivery:</span> Shipping is handled by providers such as Österreichische Post, DPD, DHL, GLS, Hermes, or UPS. Delivery times depend on the carrier.</p>
+
+            <h3>4. Payment</h3>
+            <p>Payment is processed via Stripe and is due immediately upon ordering.</p>
+            
+            <h3>5. Right of Withdrawal</h3>
+            <p>You have the right to withdraw from this contract within 14 days without giving any reason. (See "Returns" page).</p>
+        </div>
+
+        <div class="legal-divider"></div>
+
+        <div class="legal-section">
+            <h3>1. Geltungsbereich</h3>
+            <p>Diese AGB gelten für alle Bestellungen über diesen Online-Shop von Philip Moritz Heinrich (Kleinunternehmer).</p>
+
+            <h3>2. Urheberrecht & Nutzung</h3>
+            <p>Die Prints sind ausschließlich für den <span class="label-text">privaten Gebrauch</span> bestimmt. Vervielfältigung, Einscannen, digitale Verbreitung oder Veröffentlichung sind untersagt. Das Urheberrecht verbleibt beim Fotografen.</p>
+
+            <h3>3. Produktion & Versand</h3>
+            <p><span class="label-text">Produktionszeit:</span> Da die Prints auf Bestellung gefertigt werden, behalte ich mir eine Bearbeitungszeit von bis zu 14 Tagen vor dem Versand vor.</p>
+            <p><span class="label-text">Lieferung:</span> Der Versand erfolgt über Dienstleister wie Post, DPD, DHL, GLS, Hermes oder UPS. Die Lieferdauer hängt vom Zusteller ab.</p>
+
+            <h3>4. Bezahlung</h3>
+            <p>Die Bezahlung erfolgt über Stripe und ist sofort fällig.</p>
+
+            <h3>5. Widerrufsrecht</h3>
+            <p>Sie haben das Recht, binnen vierzehn Tagen ohne Angabe von Gründen diesen Vertrag zu widerrufen. (Siehe Seite "Rücksendungen").</p>
+        </div>
+    </section>
+</main>
+{% endblock %}

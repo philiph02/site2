@@ -1,62 +1,94 @@
 {% extends "base.html" %}
-{% load static wagtailcore_tags %}
-{% load wagtailimages_tags %}
+{% load static wagtailcore_tags wagtailimages_tags %}
 
-{# Dieser Block lädt das Shop-CSS in den <head> von base.html #}
 {% block extra_head %}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
-    <link rel="stylesheet" href="{% static 'home/assets_shop/css/swiper-bundle.min.css' %}">
     <link rel="stylesheet" href="{% static 'home/assets_shop/css/style.css' %}">
     <link rel="stylesheet" href="{% static 'home/assets_shop/css/colors/color-1.css' %}">
+    <style>
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            margin-top: 2rem;
+        }
+        
+        /* TEXT SIDE */
+        .about-text {
+            font-weight: 400;
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: var(--text-color);
+        }
+        .about-intro {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--title-color);
+            font-weight: 400;
+        }
+
+        /* PICTURE SIDE */
+        .about-card {
+            background-color: var(--container-color);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .about-img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            object-fit: cover;
+            margin-bottom: 1rem;
+        }
+        .about-caption {
+            font-size: 1.2rem;
+            color: var(--title-color);
+            font-weight: 400;
+        }
+
+        /* RESPONSIVE */
+        @media screen and (max-width: 768px) {
+            .about-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            /* Keep picture on top on mobile? */
+            /* Default grid behavior puts 1st column (Image) on top, which is good. */
+        }
+    </style>
 {% endblock %}
 
-
-{# Dieser Block fügt den Shop-Inhalt in base.html ein #}
 {% block content %}
-
-<div class="login" id="login">
-    <i class="bx bx-x login__close" id="login-close"></i>
-    <h2 class="login__title-center">Login</h2>
-    <form action="" class="login__form grid">
-        <div class="login__content">
-            <label for="" class="login__label">Email</label>
-            <input type="email" class="login__input">
-        </div>
-        <div class="login__content">
-            <label for="" class="login__label">Password</label>
-            <input type="password" class="login__input">
-        </div>
-        <div>
-            <a href="#" class="button">Sign in</a>
-        </div>
-        <div>
-        {% if registration_page %}
-            <p class="signup">Not a member? <a href="{% pageurl registration_page %}">Sign up now</a></p>
-        {% else %}
-            <p class="signup"><span>Sign up now</span></p>
-        {% endif %}
-        </div>
-    </form>
-</div>
-
-
 <main class="main">
-+
-+
+    <section class="section container">
+        
+        <div class="about-grid">
+            
+            <div class="about-card">
+                <img src="{% static 'home/assets/images/about_page_photo.jpg' %}" alt="Philip Heinrich" class="about-img">
+                
+                <div class="about-caption">
+                    Hey, I'm Philip
+                </div>
+            </div>
 
-    <section class="new section">
-    <h2 class="section__title">HELLO WORLD INDEX.HTML</h2>
-    
+            <div class="about-text">
+                <div class="about-intro">
+                    </div>
+                <p>
+                    I'm a glider pilot and physicist from Austria, exploring the world with my glider and camera.
+                    <br><br>
+                    Flying allows me to see the landscapes from a perspective few get to witness. Whether I'm soaring over the Austrian Alps or traveling to remote corners of the globe, I always try to capture the quiet, stunning moments that nature offers.
+                    <br><br>
+                    Photography for me is about sharing these unique views and the feeling of freedom that comes with flight.
+                </p>
+            </div>
+
+        </div>
+
     </section>
-
-
 </main>
-{% endblock %}
-
-
-{# Dieser Block lädt das Shop-JavaScript am Ende von base.html #}
-{% block extra_js %}
-    {{ block.super }} {# Übernimmt das Script aus base.html #}
-    <script src="{% static 'home/assets_shop/js/swiper-bundle.min.js' %}?v=1.0.9"></script>
-    <script src="{% static 'home/assets_shop/js/main.js' %}?v=1.0.9"></script>
 {% endblock %}
