@@ -5,31 +5,29 @@
 __pycache__/
 local_settings.py
 
-# Datenbank (NIEMALS die DB in Git einchecken!)
+# Environment variables (Secrets)
+.env
+
+# Database (SQLite is not used in production on Heroku)
 db.sqlite3
 db.sqlite3-journal
 
-# Wagtail/Django Medien-Uploads
-# (Hier landen alle Bilder, die du im Admin hochlädst)
+# Wagtail/Django Media Uploads
+# (User-uploaded content should not be in Git)
 media/
 
-# Deine neuen Ordner-Wünsche
-# (Falls du Bilder in Ordnern namens 'img' oder 'images' ablegst,
-# die NICHT zu deinem Quellcode gehören)
-img/
-image/
-images/
-webfonts/
-sass/
+# COLLECTED Static Files
+# (This is the folder Heroku generates. Do NOT check this in.)
+staticfiles/
 
+# Editor & OS files
 .vscode/
-
-# Betriebssystem
 .DS_Store
 Thumbs.db
 
-dev.py
-
-security/
-
-.env
+# Custom ignores from your previous file
+# CAREFUL: Only ignore these if they do NOT contain assets your site needs to display.
+# If your templates verify specific images in 'img/', you should remove 'img/' from this list.
+sass/
+# img/      <-- Commented out to be safe. If you have site assets here, un-ignore them!
+# webfonts/ <-- Commented out to be safe.
