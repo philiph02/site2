@@ -6,6 +6,20 @@
     <link rel="stylesheet" href="{% static 'home/assets_shop/css/style.css' %}">
     <link rel="stylesheet" href="{% static 'home/assets_shop/css/colors/color-1.css' %}">
     <style>
+        /* --- KORREKTUR: Abstand für den Header --- */
+        /* Wir geben der Seite denselben Abstand wie der Shop-Startseite (9rem),
+           damit der Text nicht oben am Rand klebt. */
+        .legal-page-header-offset {
+            padding-top: 9rem !important; 
+        }
+
+        /* Anpassung für kleinere Bildschirme */
+        @media screen and (max-width: 968px) {
+            .legal-page-header-offset {
+                padding-top: 7rem !important;
+            }
+        }
+
         .legal-section { margin-bottom: 4rem; }
         .legal-divider { border-top: 1px solid #ddd; margin: 3rem 0; }
         
@@ -24,14 +38,13 @@
         }
         a { color: var(--first-color); }
         
-        /* Custom class to replace strong tags */
         .label-text { color: var(--title-color); }
     </style>
 {% endblock %}
 
 {% block content %}
 <main class="main">
-    <section class="section container">
+    <section class="section container legal-page-header-offset">
         <h2 class="section__title" style="font-weight: 400;">Imprint / Impressum</h2>
 
         <div class="legal-section">
@@ -91,4 +104,11 @@
         </div>
     </section>
 </main>
+{% endblock %}
+
+{# --- WICHTIG: Dieser Block hat gefehlt! --- #}
+{% block extra_js %}
+    {{ block.super }}
+    <script src="{% static 'home/assets_shop/js/swiper-bundle.min.js' %}?v=1.0.9"></script>
+    <script src="{% static 'home/assets_shop/js/main.js' %}?v=1.0.9"></script>
 {% endblock %}

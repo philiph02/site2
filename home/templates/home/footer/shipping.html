@@ -6,95 +6,48 @@
     <link rel="stylesheet" href="{% static 'home/assets_shop/css/style.css' %}">
     <link rel="stylesheet" href="{% static 'home/assets_shop/css/colors/color-1.css' %}">
     <style>
-        .shipping-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 3rem;
-            align-items: start;
-            margin-top: 2rem;
-        }
-        .shipping-card {
-            background-color: var(--container-color);
-            padding: 2rem;
-            border-radius: 1rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-        }
-        .shipping-icon {
-            font-size: 2.5rem;
-            color: var(--first-color);
-            margin-bottom: 1rem;
-        }
-        h3 { 
-            font-size: 1.25rem; 
-            font-weight: 400; 
-            color: var(--title-color); 
-            margin-bottom: 1rem; 
-        }
-        p { 
-            font-size: var(--small-font-size); 
-            line-height: 1.6; 
-            color: var(--text-color); 
-            margin-bottom: 1rem;
-        }
-        .provider-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-        .provider-badge {
-            background: var(--body-color);
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            font-size: var(--smaller-font-size);
-            color: var(--title-color);
-            border: 1px solid #eee;
+        /* --- FIX: Header-Abstand --- */
+        .legal-page-header-offset { padding-top: 9rem !important; }
+        @media screen and (max-width: 968px) {
+            .legal-page-header-offset { padding-top: 7rem !important; }
         }
 
-        /* Responsive */
-        @media screen and (max-width: 768px) {
-            .shipping-grid { grid-template-columns: 1fr; }
-        }
+        .legal-section { margin-bottom: 4rem; }
+        h3 { margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 1.1rem; font-weight: 400; color: var(--title-color); }
+        p { margin-bottom: 1rem; line-height: 1.6; color: var(--text-color); font-weight: 400; }
+        .label-text { color: var(--title-color); }
     </style>
 {% endblock %}
 
 {% block content %}
 <main class="main">
-    <section class="section container">
+    <section class="section container legal-page-header-offset">
         <h2 class="section__title" style="font-weight: 400;">Shipping Information</h2>
-        
-        <div class="shipping-grid">
-            
-            <div class="shipping-card">
-                <i class='bx bx-printer shipping-icon'></i>
-                <h3>Production Time</h3>
-                <p>
-                    Every fine art print is produced specifically for you upon order ("Print on Demand") to ensure the highest quality and longevity.
-                </p>
-                <p>
-                    Please allow a production time of <strong>up to 14 days</strong> before your order is handed over to the shipping provider. In most cases, however, production is completed much faster.
-                </p>
-            </div>
 
-            <div class="shipping-card">
-                <i class='bx bx-package shipping-icon'></i>
-                <h3>Delivery & Partners</h3>
-                <p>
-                    Once your order is ready, it is securely packaged and shipped. The delivery time depends on the destination and the shipping service provider.
-                </p>
-                <p>We trust the following partners for reliable delivery:</p>
-                
-                <div class="provider-list">
-                    <span class="provider-badge">Österreichische Post</span>
-                    <span class="provider-badge">DHL</span>
-                    <span class="provider-badge">DPD Austria</span>
-                    <span class="provider-badge">GLS</span>
-                    <span class="provider-badge">UPS</span>
-                    <span class="provider-badge">Hermes</span>
-                </div>
-            </div>
+        <div class="legal-section">
+            <h3>Shipping Costs</h3>
+            <p>We ship worldwide. Shipping costs are calculated flat-rate based on your location:</p>
+            <p>
+                <span class="label-text">Austria:</span> 4.90 € (Free for A2 / Framed)<br>
+                <span class="label-text">EU Countries:</span> 12.90 € (16.90 € for A2 / Framed)<br>
+                <span class="label-text">Europe (Non-EU):</span> 19.90 €<br>
+                <span class="label-text">International (Rest of World):</span> 29.90 €
+            </p>
 
+            <h3>Delivery Times</h3>
+            <p>Your order will usually be processed within 2-5 business days. Delivery times depend on the destination:</p>
+            <p>
+                <span class="label-text">Austria:</span> 2-4 business days<br>
+                <span class="label-text">EU:</span> 3-7 business days<br>
+                <span class="label-text">International:</span> 7-21 business days
+            </p>
         </div>
     </section>
 </main>
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    <script src="{% static 'home/assets_shop/js/swiper-bundle.min.js' %}?v=1.0.9"></script>
+    <script src="{% static 'home/assets_shop/js/main.js' %}?v=1.0.9"></script>
 {% endblock %}

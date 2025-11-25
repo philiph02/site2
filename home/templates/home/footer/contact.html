@@ -6,6 +6,16 @@
     <link rel="stylesheet" href="{% static 'home/assets_shop/css/style.css' %}">
     <link rel="stylesheet" href="{% static 'home/assets_shop/css/colors/color-1.css' %}">
     <style>
+        /* --- FIX: Header-Abstand --- */
+        .legal-page-header-offset {
+            padding-top: 9rem !important; 
+        }
+        @media screen and (max-width: 968px) {
+            .legal-page-header-offset {
+                padding-top: 7rem !important;
+            }
+        }
+
         .contact-container {
             display: grid;
             grid-template-columns: 1fr 1.5fr;
@@ -112,7 +122,7 @@
 
 {% block content %}
 <main class="main">
-    <section class="section container">
+    <section class="section container legal-page-header-offset">
         <h2 class="section__title" style="font-weight: 400;">Get in Touch</h2>
         
         <div class="contact-container">
@@ -161,8 +171,6 @@
                     <input type="email" class="form-input" placeholder="Your Email">
                 </div>
                 
-
-
                 <div class="form-group">
                     <label class="form-label">Message</label>
                     <textarea class="form-input" rows="5" placeholder="How can I help you?"></textarea>
@@ -174,4 +182,11 @@
         </div>
     </section>
 </main>
+{% endblock %}
+
+{# --- ADDED JS BLOCK --- #}
+{% block extra_js %}
+    {{ block.super }}
+    <script src="{% static 'home/assets_shop/js/swiper-bundle.min.js' %}?v=1.0.9"></script>
+    <script src="{% static 'home/assets_shop/js/main.js' %}?v=1.0.9"></script>
 {% endblock %}

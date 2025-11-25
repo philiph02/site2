@@ -6,6 +6,12 @@
     <link rel="stylesheet" href="{% static 'home/assets_shop/css/style.css' %}">
     <link rel="stylesheet" href="{% static 'home/assets_shop/css/colors/color-1.css' %}">
     <style>
+        /* --- FIX: Header-Abstand --- */
+        .about-page-header-offset { padding-top: 9rem !important; }
+        @media screen and (max-width: 968px) {
+            .about-page-header-offset { padding-top: 7rem !important; }
+        }
+
         .about-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -55,15 +61,13 @@
                 grid-template-columns: 1fr;
                 gap: 2rem;
             }
-            /* Keep picture on top on mobile? */
-            /* Default grid behavior puts 1st column (Image) on top, which is good. */
         }
     </style>
 {% endblock %}
 
 {% block content %}
 <main class="main">
-    <section class="section container">
+    <section class="section container about-page-header-offset">
         
         <div class="about-grid">
             
@@ -91,4 +95,10 @@
 
     </section>
 </main>
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    <script src="{% static 'home/assets_shop/js/swiper-bundle.min.js' %}?v=1.0.9"></script>
+    <script src="{% static 'home/assets_shop/js/main.js' %}?v=1.0.9"></script>
 {% endblock %}

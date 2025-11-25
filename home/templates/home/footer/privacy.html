@@ -6,83 +6,39 @@
     <link rel="stylesheet" href="{% static 'home/assets_shop/css/style.css' %}">
     <link rel="stylesheet" href="{% static 'home/assets_shop/css/colors/color-1.css' %}">
     <style>
-        .legal-section { margin-bottom: 4rem; }
-        .legal-divider { border-top: 1px solid #ddd; margin: 3rem 0; }
-        
-        /* Titles */
-        h3 { 
-            margin-top: 1.5rem; 
-            margin-bottom: 0.5rem; 
-            font-size: 1.1rem; 
-            color: var(--title-color);
-            font-weight: 400 !important; 
+        /* --- FIX: Header-Abstand --- */
+        .legal-page-header-offset { padding-top: 9rem !important; }
+        @media screen and (max-width: 968px) {
+            .legal-page-header-offset { padding-top: 7rem !important; }
         }
 
-        /* FIX: Scope these styles ONLY to the legal text, not the footer! */
-        .legal-section p, 
-        .legal-section li { 
-            margin-bottom: 1rem; 
-            line-height: 1.6; 
-            color: var(--text-color); 
-            font-weight: 400; 
-        }
-        
-        /* FIX: Only bullets inside the legal text */
-        .legal-section ul { 
-            list-style-type: disc; 
-            padding-left: 1.5rem; 
-        }
-        
-        .label-text { color: var(--title-color); }
+        .legal-section { margin-bottom: 4rem; }
+        h3 { margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 1.1rem; font-weight: 400; color: var(--title-color); }
+        p { margin-bottom: 1rem; line-height: 1.6; color: var(--text-color); font-weight: 400; }
     </style>
 {% endblock %}
 
 {% block content %}
 <main class="main">
-    <section class="section container">
-        <h2 class="section__title" style="font-weight: 400;">Privacy Policy / Datenschutzerklärung</h2>
+    <section class="section container legal-page-header-offset">
+        <h2 class="section__title" style="font-weight: 400;">Privacy Policy</h2>
 
         <div class="legal-section">
-            <h3>1. General Information</h3>
-            <p>We treat your personal data confidentially and in accordance with the statutory data protection regulations and this privacy policy.</p>
+            <h3>General</h3>
+            <p>The protection of your personal data is of particular concern to us. We process your data exclusively on the basis of the legal regulations (DSGVO, TKG 2003).</p>
 
-            <h3>2. Data Collection</h3>
-            <p><span class="label-text">Orders & Shipping:</span> When ordering, we collect your name, shipping address, and email. This is necessary to fulfill the contract. We may pass your address to shipping partners (e.g., Österreichische Post, DPD, DHL, GLS, Hermes, UPS) solely for delivery purposes.</p>
+            <h3>Contact with us</h3>
+            <p>If you contact us via the form on the website or by e-mail, your data will be stored for six months for the purpose of processing the inquiry and in case of follow-up questions. We will not share this data without your consent.</p>
 
-            <p><span class="label-text">Payments:</span> Payments are processed via Stripe. Payment data is transmitted directly to Stripe; we do not store full credit card details.</p>
-
-            <h3>3. Cookies</h3>
-            <p>Our website uses cookies. These are small text files stored on your device to make our website more user-friendly, effective, and secure. Some cookies are technically necessary (e.g., for the shopping cart function), while others help us analyze user behavior. You can adjust your browser settings to refuse cookies, though this may limit site functionality.</p>
-
-            <h3>4. Your Rights</h3>
-            <p>You have the right to request information about your stored data, its origin, and recipients, as well as the right to correction or deletion at any time.</p>
-
-            <h3>5. Responsible Party</h3>
-            <p>Philip Moritz Heinrich<br>
-            Gussenbauergasse 5-7/3/8, 1090 Vienna, Austria</p>
-        </div>
-
-        <div class="legal-divider"></div>
-
-        <div class="legal-section">
-            <h3>1. Allgemeines</h3>
-            <p>Wir behandeln Ihre personenbezogenen Daten vertraulich und entsprechend der gesetzlichen Datenschutzvorschriften sowie dieser Datenschutzerklärung.</p>
-
-            <h3>2. Datenerfassung</h3>
-            <p><span class="label-text">Bestellung & Versand:</span> Zur Vertragserfüllung speichern wir Name, Adresse und E-Mail. Zur Lieferung geben wir Adressdaten ggf. an Versanddienstleister (z.B. Post, DPD, DHL, GLS, Hermes, UPS) weiter.</p>
-
-            <p><span class="label-text">Zahlungen:</span> Wir nutzen Stripe. Zahlungsdaten werden direkt an Stripe übermittelt. Wir speichern keine vollständigen Kreditkartendaten.</p>
-
-            <h3>3. Cookies</h3>
-            <p>Unsere Website verwendet Cookies. Das sind kleine Textdateien, die auf Ihrem Endgerät gespeichert werden. Sie machen unser Angebot nutzerfreundlicher und sicherer. Einige Cookies sind technisch notwendig (z.B. für den Warenkorb), andere dienen der Analyse. Sie können Ihren Browser so einstellen, dass Cookies abgelehnt werden, was jedoch die Funktionalität einschränken kann.</p>
-
-            <h3>4. Ihre Rechte</h3>
-            <p>Sie haben jederzeit das Recht auf unentgeltliche Auskunft über Ihre gespeicherten Daten sowie ein Recht auf Berichtigung oder Löschung.</p>
-
-            <h3>5. Verantwortlicher</h3>
-            <p>Philip Moritz Heinrich<br>
-            Gussenbauergasse 5-7/3/8, 1090 Wien, Österreich</p>
+            <h3>Web Shop</h3>
+            <p>For the purpose of contract processing, the following data is stored by us: Name, Address, Email. The data provided by you is necessary for the fulfillment of the contract or for the implementation of pre-contractual measures.</p>
         </div>
     </section>
 </main>
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    <script src="{% static 'home/assets_shop/js/swiper-bundle.min.js' %}?v=1.0.9"></script>
+    <script src="{% static 'home/assets_shop/js/main.js' %}?v=1.0.9"></script>
 {% endblock %}
